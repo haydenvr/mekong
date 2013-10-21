@@ -63,7 +63,8 @@ sub login_form {
 	<p>
 	<form>
 		login: <input type="text" name="login" size=16></input>
-		password: <input type="text" name="password" size=16></input>
+		<p>password: <input type="text" name="password" size=16></input>
+		<p><input type="submit" name="Submit" value="Submit" />
 	</form>
 	<p>
 eof
