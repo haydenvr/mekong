@@ -33,10 +33,15 @@ sub cgi_main {
 	read_books($books_file);
 
 	my $login = param('login');
+	my $password = param('password');
 	my $search_terms = param('search_terms');
 	
 	if (defined $search_terms) {
-		print search_results($search_terms);
+		if (authenticate($login, $password)) { #need to code this
+			print search_results($search_terms);
+		} else {
+			print $last_error; #need to code this
+		}		
 	} elsif (defined $login) {
 		print search_form();
 	} else {
@@ -46,12 +51,19 @@ sub cgi_main {
 	print page_trailer();
 }
 
+# simple form containing last error
+#sub error {
+#	return $last_error;
+
+
+
 # simple login form without authentication	
 sub login_form {
 	return <<eof;
 	<p>
 	<form>
 		login: <input type="text" name="login" size=16></input>
+		password: <input type="text" name="password" size=16></input>
 	</form>
 	<p>
 eof
