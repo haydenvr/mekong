@@ -35,7 +35,6 @@ sub cgi_main {
 	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
-	my $to_debug = param('debug') || 0;
 	
 	if (defined $search_terms) {
 		print search_results($search_terms);			
@@ -49,7 +48,7 @@ sub cgi_main {
 		print login_form();
 	}
 	
-	print page_trailer($to_debug);
+	print page_trailer(param('debug'));
 }
 
 # returns the beggining of a table
