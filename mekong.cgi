@@ -53,10 +53,10 @@ sub cgi_main {
 
 # prints out the beggining of a table
 sub begin_table {
-	my $color = $_[0] || $color = "white";
-	my $align = $_[1] || $align = "center";
-	my $border = $_[2] || $border = "1";
-	my $caption = $_[3] || $caption = "";
+	my $color = $_[0] or $color = "white";
+	my $align = $_[1] or $align = "center";
+	my $border = $_[2] or $border = "1";
+	my $caption = $_[3] or $caption = "";
 	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
 }
 
