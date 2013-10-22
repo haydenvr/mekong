@@ -112,11 +112,11 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	$my $debugging_info = debugging_info();
-	
-	return <<eof;
-	$debugging_info
-	</div>
+        my $debugging_info = debugging_info();
+        
+        return <<eof;
+        $debugging_info
+        </div>
 <body>
 </html>
 eof
