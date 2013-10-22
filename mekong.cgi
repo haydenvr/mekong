@@ -59,7 +59,9 @@ sub cgi_main {
 
 # simple login form without authentication	
 sub login_form {
-	return start_form, textfield('login'), "<p>", password_field('password'), submit('Login');
+	return start_form, "<table align="center"><caption><font color=red></font></caption> <tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+ <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
+ <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
 
 # simple search form
