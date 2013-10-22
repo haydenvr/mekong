@@ -1,0 +1,2 @@
+Date    Start   Stop    Activity        
+22/10	10:20am	12:20am	added password checking, cleaned up presentation a bit with tables, formatted search results, mainly messing around with html to get used to it
