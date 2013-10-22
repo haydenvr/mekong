@@ -36,11 +36,11 @@ sub cgi_main {
 	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
-	my $create_new = param('CreateNewAccount');
+	#my $create_new = param('CreateNewAccount');
 	
-	if (defined $create_new) {
-		print "HEEEEEEEEEEEEEEEEEEEEEEY\n";
-	elsif (defined $search_terms) {
+	#if (defined $create_new) {
+	#	print "HEEEEEEEEEEEEEEEEEEEEEEY\n";
+	if (defined $search_terms) {
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
