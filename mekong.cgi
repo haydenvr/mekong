@@ -28,7 +28,7 @@ exit 0;
 
 sub cgi_main {
 	print page_header();
-	print menu();
+	print menu_print();
 	
 	set_global_variables();
 	read_books($books_file);
@@ -52,17 +52,9 @@ sub cgi_main {
 	print page_trailer();
 }
 
-sub menu {
+sub menu_print {
 	return <<eof;
-<div id="leftcolumn"> 
-	<a href="google.com"><img src="data/label.png" alt="My logo"></a>
-	<p>
-	<ul>
-		<li>Coffee</li>
-		<li>Tea</li>
-		<li>Milk</li>
-	</ul> 
-</div>
+<div class="leftcolumn"><a href="http://www.google.com.au/"><img src="data/label.png" alt="My logo"></a><p><ul><li>Coffee</li>	<li>Tea</li><li>Milk</li></ul></div>
 eof
 }
 
@@ -94,7 +86,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return start_form, "<div style=\"table\">",begin_table, $descriptions, "</table></div>", end_form;
+	return start_form, "<div class=\"table\">",begin_table, $descriptions, "</table></div>", end_form;
 }
 
 #
@@ -110,7 +102,7 @@ Content-Type: text/html
 <title>mekong.com.au</title>
 <link rel="stylesheet" type="text/css" href="table.css" media="screen" />
 </head>
-<body>
+<body bgcolor="#E6E6FA">
 <p>
 <div class="container">
 eof
@@ -777,7 +769,7 @@ sub print_books(@) {
 # return descriptions of specified books in formatted table html
 sub get_book_descriptions {
 	my @isbns = @_;
-	my $descriptions = "";
+	my $descriptions = "<tr><td>Image</td><td>Description</td><td>Price</td></tr>\n";
 	our %book_details;
 	foreach $isbn (@isbns) {
 		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
