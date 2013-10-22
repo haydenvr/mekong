@@ -51,15 +51,19 @@ sub cgi_main {
 	print page_trailer();
 }
 
-# simple form containing last error
-#sub error {
-#	return $last_error;
-
+# prints out the beggining of a table
+sub begin_table {
+	my $color = $_[0] || $color = "white";
+	my $align = $_[1] || $align = "center";
+	my $border = $_[2] || $border = "1";
+	my $caption = $_[3] || $caption = "";
+	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
+}
 
 
 # simple login form without authentication	
 sub login_form {
-	return start_form, "<table align=\"center\"><caption><font color=red></font></caption> <tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+	return start_form, begin_table, "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
  <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
@@ -84,6 +88,7 @@ sub search_results {
 	<p>$search_terms
 	<p>@matching_isbns
 	<pre>
+		
 		$descriptions
 	</pre>
 	<p>
