@@ -53,8 +53,7 @@ sub cgi_main {
 
 # prints out the beggining of a table
 sub begin_table {
-	my $color = "white";
-	my $align = "center";
+	my $color = "white", my $align = "center";
 	my $border = "1";
 	my $caption = "";
 	if (defined $_[0] && $_[0] ne '') { $color = $_[0]; }
