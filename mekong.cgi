@@ -53,12 +53,13 @@ sub cgi_main {
 
 # returns the beggining of a table
 sub begin_table {
-	my $color = "white", my $align = "center", my $border = "1", my $caption = "";
+	my $color = "white", my $align = "center", my $border = "1", my $caption = ""; my $width = "1000";
 	if (defined $_[0] && $_[0] ne '') { $color = $_[0]; }
 	if (defined $_[1] && $_[1] ne '') { $align = $_[1]; }
 	if (defined $_[2] && $_[2] ne '') { $border = $_[2]; }
 	if (defined $_[3] && $_[3] ne '') { $caption = $_[3]; }
-	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
+	if (defined $_[4] && $_[4] ne '') { $width = $_[4]; }
+	return "<table bgcolor=\"$color\" width=\"$width\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
 }
 
 # simple login form with password	
@@ -777,7 +778,7 @@ sub get_book_descriptions {
 		my $big_image = $book_details{$isbn}{largeimageurl} || "";
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
-		$descriptions .= sprintf "<tr><td><a href=\"%s\" onmouseover=\"Click for larger image\" ><img src=\"%s\"></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
+		$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\"></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
 	}
 	
 	return $descriptions;
