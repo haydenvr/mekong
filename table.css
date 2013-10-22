@@ -81,3 +81,20 @@
 }.table tr:last-child td:last-child{
 	border-width:0px 0px 0px 0px;
 }
+#leftcolumn {
+	width: 160px;
+	float: left;
+	margin-right: 4px;
+	margin-left: 10px;
+}
+#main {
+	width: 800px;
+	float: left;
+	margin-right: 4px;	
+	margin-left: 10px;
+}
+ul {
+	list-style-type: none;
+	padding: 0px;
+	margin: 3px;
+}
