@@ -57,10 +57,10 @@ sub begin_table {
 	my $align = "center";
 	my $border = "1";
 	my $caption = "";
-	if (defined $_[0]) { $color = $_[0]; }
-	if (defined $_[1]) { $align = $_[1]; }
-	if (defined $_[2]) { $border = $_[2]; }
-	if (defined $_[3]) { $caption = $_[3]; }
+	if (defined $_[0] || $_[0] ne '') { $color = $_[0]; }
+	if (defined $_[1] || $_[1] ne '') { $align = $_[1]; }
+	if (defined $_[2] || $_[2] ne '') { $border = $_[2]; }
+	if (defined $_[3] || $_[3] ne '') { $caption = $_[3]; }
 	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
 }
 
