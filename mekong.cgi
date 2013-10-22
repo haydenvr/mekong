@@ -53,9 +53,7 @@ sub cgi_main {
 
 # prints out the beggining of a table
 sub begin_table {
-	my $color = "white", my $align = "center";
-	my $border = "1";
-	my $caption = "";
+	my $color = "white", my $align = "center", my $border = "1", my $caption = "";
 	if (defined $_[0] && $_[0] ne '') { $color = $_[0]; }
 	if (defined $_[1] && $_[1] ne '') { $align = $_[1]; }
 	if (defined $_[2] && $_[2] ne '') { $border = $_[2]; }
@@ -66,7 +64,7 @@ sub begin_table {
 
 # simple login form without authentication	
 sub login_form {
-	return start_form, begin_table("","","0"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+	return start_form, begin_table("","","0","pwd not accepted"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
  <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
