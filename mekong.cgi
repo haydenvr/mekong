@@ -773,7 +773,7 @@ sub get_book_descriptions {
 		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
 		my $title = $book_details{$isbn}{title} || "";
 		my $authors = $book_details{$isbn}{authors} || "";
-		my $image = $book_details{$isbn}{largeimageurl}; # || "";
+		my $image = $book_details{$isbn}{smallimageurl}; # || "";
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
 		$descriptions .= sprintf "<tr><td><img src=\"%s\"></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $image,$title, $authors,$book_details{$isbn}{price};
