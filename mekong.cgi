@@ -112,7 +112,7 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	debugging_info if $_[0];
+	debugging_info() if $_[0];
 	
 	return <<eof;
 	$debugging_info
