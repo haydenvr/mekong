@@ -4,6 +4,8 @@
 # http://www.cse.unsw.edu.au/~cs2041/assignments/mekong/
 
 use CGI qw/:all/;
+use CGI:Carp qw(warningsToBrowser fatalsToBrowser);
+warningsToBrowser(1);
 
 $debug = 0;
 $| = 1;
