@@ -112,9 +112,7 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	$my $debugging_info = '';
-	my $to_debug = param('debug');
-	if (defined $to_debug) { $debugging_info .= "hello"; } #debugging_info();
+	$my $debugging_info = debugging_info();
 	
 	return <<eof;
 	$debugging_info
