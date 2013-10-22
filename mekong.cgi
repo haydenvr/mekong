@@ -35,6 +35,7 @@ sub cgi_main {
 	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
+	our $debug = param('debug');
 	
 	if (defined $search_terms) {
 		print search_results($search_terms);			
@@ -112,7 +113,7 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	my $debugging_info = debugging_info();
+	debugging_info if $debug = 1
 	
 	return <<eof;
 	$debugging_info
