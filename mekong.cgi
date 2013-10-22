@@ -64,7 +64,7 @@ sub begin_table {
 
 # simple login form with password	
 sub login_form {
-	return start_form, begin_table("","","0"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+	return start_form, begin_table("","","0","","400"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
  <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
