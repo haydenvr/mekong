@@ -251,9 +251,9 @@ sub total_books {
 sub authenticate {
 	my ($login, $password) = @_;
 	our (%user_details, $last_error);
-	
-	return 0 if !legal_login($login);
 	print "trying to access user $login<p>";
+	return 0 if !legal_login($login);
+	
 	if (!open(USER, "$users_dir/$login")) {
 		$last_error = "User '$login' does not exist.";
 		return 0;
