@@ -53,17 +53,21 @@ sub cgi_main {
 
 # prints out the beggining of a table
 sub begin_table {
-	my $color = $_[0] or $color = "white";
-	my $align = $_[1] or $align = "center";
-	my $border = $_[2] or $border = "1";
-	my $caption = $_[3] or $caption = "";
+	my $color = "white";
+	my $align = "center";
+	my $border = "1";
+	my $caption = "";
+	if (defined $_[0]) { $color = $_[0]; }
+	if (defined $_[1]) { $align = $_[1]; }
+	if (defined $_[2]) { $border = $_[2]; }
+	if (defined $_[3]) { $caption = $_[3]; }
 	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
 }
 
 
 # simple login form without authentication	
 sub login_form {
-	return start_form, begin_table, "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+	return start_form, begin_table(, "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
  <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
