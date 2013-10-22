@@ -777,7 +777,7 @@ sub get_book_descriptions {
 		my $big_image = $book_details{$isbn}{largeimageurl} || "";
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
-		$descriptions .= sprintf "<tr><td><a href=\"%s\"><img onmouseover=\"Click for larger image\"src=\"%s\"></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
+		$descriptions .= sprintf "<tr><td><a href=\"%s\"><img onmouseover=\"Click for larger image\" src=\"%s\"></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
 	}
 	
 	return $descriptions;
