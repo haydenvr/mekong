@@ -35,7 +35,7 @@ sub cgi_main {
 	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
-	our $debug = param('debug');
+	my $to_debug = param('debug') || 0;
 	
 	if (defined $search_terms) {
 		print search_results($search_terms);			
@@ -49,7 +49,7 @@ sub cgi_main {
 		print login_form();
 	}
 	
-	print page_trailer();
+	print page_trailer($to_debug);
 }
 
 # returns the beggining of a table
@@ -113,7 +113,7 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	debugging_info if $debug == 1;
+	debugging_info if $_[0];
 	
 	return <<eof;
 	$debugging_info
