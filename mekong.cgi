@@ -113,7 +113,7 @@ eof
 #
 sub page_trailer() {
         my $debugging_info = "";
-		if (defined param('debug')) $debugging_info = debugging_info();
+		if (defined param('debug')) { $debugging_info = debugging_info(); }
         
         return <<eof;
         $debugging_info
