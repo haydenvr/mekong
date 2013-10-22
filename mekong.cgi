@@ -54,7 +54,7 @@ sub cgi_main {
 
 sub menu_print {
 	return <<eof;
-<div class="leftcolumn"><a href="google.com"><img src="data/label.png" alt="My logo"></a><p><ul><li>Coffee</li>	<li>Tea</li><li>Milk</li></ul></div>
+<div class="leftcolumn"><a href="http://www.google.com.au/"><img src="data/label.png" alt="My logo"></a><p><ul><li>Coffee</li>	<li>Tea</li><li>Milk</li></ul></div>
 eof
 }
 
