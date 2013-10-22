@@ -51,7 +51,7 @@ sub cgi_main {
 	print page_trailer();
 }
 
-# prints out the beggining of a table
+# returns the beggining of a table
 sub begin_table {
 	my $color = "white", my $align = "center", my $border = "1", my $caption = "";
 	if (defined $_[0] && $_[0] ne '') { $color = $_[0]; }
@@ -61,10 +61,9 @@ sub begin_table {
 	return "<table bgcolor=\"$color\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
 }
 
-
-# simple login form without authentication	
+# simple login form with password	
 sub login_form {
-	return start_form, begin_table("","","0","pwd not accepted"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
+	return start_form, begin_table("","","0"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
  <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
 }
@@ -85,15 +84,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return <<eof;
-	<p>$search_terms
-	<p>@matching_isbns
-	<pre>
-		
-		$descriptions
-	</pre>
-	<p>
-eof
+	return start_form, begin_table, $descriptions, "</table>", end_form;
 }
 
 #
@@ -773,7 +764,7 @@ sub print_books(@) {
 	print get_book_descriptions(@isbns);
 }
 
-# return descriptions of specified books
+# return descriptions of specified books in formatted table html
 sub get_book_descriptions {
 	my @isbns = @_;
 	my $descriptions = "";
@@ -785,8 +776,9 @@ sub get_book_descriptions {
 		my $image = $book_details{$isbn}{largeimageurl}; # || "";
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
-		$descriptions .= sprintf "%s : %s %7s %s - %s\n", $image,$isbn, $book_details{$isbn}{price}, $title, $authors;
+		$descriptions .= sprintf "<tr><td><img src=\"%s\"></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $image,$title, $authors,$book_details{$isbn}{price};
 	}
+	
 	return $descriptions;
 }
 
