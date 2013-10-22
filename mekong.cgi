@@ -71,13 +71,7 @@ sub login_form {
 
 # simple search form
 sub search_form {
-	return <<eof;
-	<p>
-	<form>
-		search: <input type="text" name="search_terms" size=60></input>
-	</form>
-	<p>
-eof
+	return start_form, textfield('search_terms'),submit('Search Books'), end_form;
 }
 
 # ascii display of search results
@@ -85,7 +79,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return start_form, begin_table, $descriptions, "</table>", end_form;
+	return start_form, begin_table, $descriptions, "</table></div>", end_form;
 }
 
 #
@@ -778,7 +772,7 @@ sub get_book_descriptions {
 		my $big_image = $book_details{$isbn}{largeimageurl} || "";
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
-		$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\"></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
+		$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\" ></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
 	}
 	
 	return $descriptions;
