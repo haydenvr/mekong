@@ -79,7 +79,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return start_form, begin_table, $descriptions, "</table></div>", end_form;
+	return start_form, "<div style=\"table\">",begin_table, $descriptions, "</table></div>", end_form;
 }
 
 #
