@@ -28,7 +28,7 @@ exit 0;
 
 sub cgi_main {
 	print page_header();
-	print menu();
+	print menu_print();
 	
 	set_global_variables();
 	read_books($books_file);
@@ -52,17 +52,9 @@ sub cgi_main {
 	print page_trailer();
 }
 
-sub menu {
+sub menu_print {
 	return <<eof;
-<div id="leftcolumn"> 
-	<a href="google.com"><img src="data/label.png" alt="My logo"></a>
-	<p>
-	<ul>
-		<li>Coffee</li>
-		<li>Tea</li>
-		<li>Milk</li>
-	</ul> 
-</div>
+<div class="leftcolumn"><a href="google.com"><img src="data/label.png" alt="My logo"></a><p><ul><li>Coffee</li>	<li>Tea</li><li>Milk</li></ul></div>
 eof
 }
 
