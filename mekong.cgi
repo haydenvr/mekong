@@ -81,7 +81,7 @@ sub begin_table {
 sub login_form {
 	return start_form, begin_table("","","0","","400"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr>
  <tr><td>Password:</td><td>", password_field('password'), "</td></tr>
- <tr><td align=\"center\" colspan=\"1\"> ", submit('Login'), "</td></tr></table>", end_form;
+ <tr><td align=\"center\" colspan=\"2\"> ", submit('Login'), "</td><td>", submit('Create New Account'), "</tr></table>", end_form;
 }
 
 # simple search form
