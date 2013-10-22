@@ -48,7 +48,7 @@ sub cgi_main {
 		print login_form();
 	}
 	
-	print page_trailer(param('debug'));
+	print page_trailer();
 }
 
 # returns the beggining of a table
@@ -112,8 +112,8 @@ eof
 # HTML at bottom of every screen
 #
 sub page_trailer() {
-	$my $debugging_info = '';
-	$debugging_info = debugging_info() if $_[0];
+	if (!defined param('debug') $my $debugging_info = '';
+	else $debugging_info = debugging_info();
 	
 	return <<eof;
 	$debugging_info
