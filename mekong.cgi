@@ -37,13 +37,13 @@ sub cgi_main {
 	my $search_terms = param('search_terms');
 	
 	if (defined $search_terms) {
+		print search_results($search_terms);			
+	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
-			print search_results($search_terms);
+			print search_form();
 		} else {
 			print $last_error; #need to code this
-		}		
-	} elsif (defined $login) {
-		print search_form();
+		}	
 	} else {
 		print login_form();
 	}
@@ -251,7 +251,7 @@ sub total_books {
 sub authenticate {
 	my ($login, $password) = @_;
 	our (%user_details, $last_error);
-	print "trying to access user $login<p>";
+	
 	return 0 if !legal_login($login);
 	
 	if (!open(USER, "$users_dir/$login")) {
