@@ -99,8 +99,7 @@ Content-Type: text/html
 <html lang="en">
 <head>
 <title>mekong.com.au</title>
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
-<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="table.css" media="screen" />
 </head>
 <body>
 <p>
