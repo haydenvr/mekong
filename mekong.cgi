@@ -921,11 +921,10 @@ eof
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
-<td><i>$title</i><br>$authors<br></td> 
-<td>$book_details{$isbn}{price}
+<td><i>$title</i><br>$authors<br></td><td>
 eof
-		$descriptions .= submit('Buy Me!','$isbn');
-		$descriptions .= "</td></tr>\n";
+		$descriptions .= submit("bought $isbn",'Buy Me!');
+		$descriptions .= "<br><br>$book_details{$isbn}{price}</td></tr>\n";
 	}
 	$descriptions .= "</tbody></table>";
 	return $descriptions;
