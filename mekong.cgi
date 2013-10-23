@@ -32,29 +32,37 @@ sub cgi_main {
 #	print menu_print();
 	set_global_variables();
 	read_books($books_file);
-
 	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
-	my $add_to_cart = param('Buy Me!');
-	if (defined $add_to_cart) {
-		print "YOU HAVE BEEN SUCCESSFUL\n";
+
+	foreach $p (param()) {
+		if ($p =~ /^bought ([0-9]*)/) {
+			$isbn = $1;
+			$add_to_cart = $p;
+		} 
 	}
-	if (defined $create_new) {
+	if (defined $add_to_cart) {
+		print page_header("signin.css");
+		#need to add the $ISBN variable to cart
+	} elsif (defined $create_new) {
 		my $username = param('username');
 		if (defined $username) {
 			if (create_New_User()) {
+				print page_header("signin.css");
 				print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
 			} else {
+				print page_header("signin.css");
 				print newAccount();
 			}
 		} else {
+			print page_header("signin.css");
 			print newAccount();
 		}
 	} elsif (defined $search_terms) {
 		print page_header("signin.css");
-		print search_form();
+		print search_form($search_terms);
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
@@ -120,23 +128,23 @@ sub login_form {
           <input type="checkbox" value="remember-me"> Remember me
         </label>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+	<button class="btn btn-lg btn-primary btn-block" type="submit" name="Create New Account" >Create New Account</button>
       </form>
 
     </div>
 eof
-#	return start_form, begin_table("","","0","","400"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr><tr><td>Password:</td><td>", password_field('password'), "</td></tr><tr><td align=\"center\" colspan=\"2\"> ", submit('Login'), "</td><td>", submit('Create New Account'), "</td></tr></table>", end_form;
 }
 
 # simple search form
 sub search_form {
-	#return start_form, textfield('search_terms'),submit('Search Books'), end_form;
+	my $place_hold = $_[0] || "Search";
 	return <<eof;
 <div class="container">
-<form class="ul-search" method="post" align="center" >
+<form class="ul-search" method="get" align="center" >
 <pre >Please enter a search term <br>
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
-  <input type="text" name="search_terms" class="form-control" placeholder="Search">
+  <input type="text" name="search_terms" class="form-control" placeholder="$place_hold">
 </div>
 </pre>
 </form></div>
@@ -188,9 +196,9 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="#">Search</a></li>
+            <li><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?search_terms=">Search</a></li>
             <li><a href="#">Cart</a></li>
-            <li class="active"><a href="#">Sign In</a></li>
+            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -900,6 +908,7 @@ sub print_books(@) {
 
 # return descriptions of specified books in formatted table html
 sub get_book_descriptions {
+	if (!defined @_) { return "\n"; } 
 	my @isbns = @_;
 	my $descriptions = <<eof;
 <table class="table">
