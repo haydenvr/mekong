@@ -92,7 +92,6 @@ sub create_New_User {
 	} else {
 		return 0;
 	}
-	
 }
 
 sub newAccount {
