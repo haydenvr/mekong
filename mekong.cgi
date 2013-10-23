@@ -37,7 +37,10 @@ sub cgi_main {
 	my $password = param('password');
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
-	
+	my $add_to_cart = param('Buy Me!');
+	if (defined $add_to_cart) {
+		print "YOU HAVE BEEN SUCCESSFUL\n";
+	}
 	if (defined $create_new) {
 		my $username = param('username');
 		if (defined $username) {
@@ -71,7 +74,7 @@ sub create_New_User {
 	my $postcode = param('Postcode'), my $email = param('Email');
 	if (legal_login($user)&&legal_password($pass)) {
 		open F, ">users/$user";
-		print <F> "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email";
+		print F "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email";
 		close F;
 		return 1;
 	} else {
@@ -81,7 +84,7 @@ sub create_New_User {
 }
 
 sub newAccount {
-	return "<div id=\"main\">", start_form, begin_table("","center","0","Enter your Details","400"), "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", textfield('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table>", end_form, "</div>";
+	return "<div id=\"main\">", start_form, begin_table("","center","0","Enter your Details","400"), "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", password_field('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table>", end_form, "</div>";
 }
 
 sub menu_print {
@@ -809,7 +812,9 @@ foreach $isbn (@isbns) {
 	my $big_image = $book_details{$isbn}{largeimageurl} || "";
 	$authors =~ s/\n([^\n]*)$/ & $1/g;
 	$authors =~ s/\n/, /g;
-	$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\" ></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s</tt></td></tr>\n", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
+	$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\" ></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s<p>", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
+	$descriptions .= submit('Buy Me!','$isbn');
+	$descriptions .= "</tt></td></tr>\n";
 }
 
 return $descriptions;
