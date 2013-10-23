@@ -128,7 +128,18 @@ eof
 
 # simple search form
 sub search_form {
-	return start_form, textfield('search_terms'),submit('Search Books'), end_form;
+	#return start_form, textfield('search_terms'),submit('Search Books'), end_form;
+	return <<eof;
+<div class="container">
+<form class="ul-search" method="post" align="center" >
+<pre >Please enter a search term <br>
+<div class="input-group">
+  <span class="input-group-addon">@</span>
+  <input type="text" name="search_terms" class="form-control" placeholder="Search">
+</div>
+</pre>
+</form></div>
+eof
 }
 
 # ascii display of search results
@@ -176,9 +187,9 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Search</a></li>
+            <li><a href="#">Search</a></li>
             <li><a href="#">Cart</a></li>
-            <li><a href="#">Sign In</a></li>
+            <li class="active"><a href="#">Sign In</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
