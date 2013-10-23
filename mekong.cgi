@@ -46,7 +46,6 @@ sub cgi_main {
 		if (defined $username) {
 			if (create_New_User()) {
 				print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
-			
 			} else {
 				print newAccount();
 			}
@@ -54,12 +53,14 @@ sub cgi_main {
 			print newAccount();
 		}
 	} elsif (defined $search_terms) {
+		print page_header("table.css");
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
+			print page_header("table.css");
 			print search_form();
 		} else {
-			
+			print page_header("table.css");
 			print $last_error; #need to code this
 		}	
 	} else {
@@ -158,7 +159,7 @@ Content-Type: text/html
     <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="navbar.css" rel="stylesheet">
+    <link href="navbar.css" rel="stylesheet">	
 <link rel="stylesheet" type="text/css" href="$css_inc" media="screen" />
 </head>
 <div class="container">
