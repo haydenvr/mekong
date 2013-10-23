@@ -96,7 +96,7 @@ sub create_New_User {
 }
 
 sub newAccount {
-	return "<div id=\"main\">", start_form, begin_table("","center","0","Enter your Details","400"), "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", password_field('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table>", end_form, "</div>";
+	return start_form, "<div class=\"container\">",begin_table, "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", password_field('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table></div>", end_form;
 }
 
 sub menu_print {
