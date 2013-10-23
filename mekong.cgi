@@ -28,8 +28,8 @@ exit 0;
 
 sub cgi_main {
 	print page_header();
-	print menu_print();
-	
+	print print_navbar();
+#	print menu_print();
 	set_global_variables();
 	read_books($books_file);
 
@@ -106,7 +106,20 @@ sub begin_table {
 
 # simple login form with password	
 sub login_form {
-	return start_form, begin_table("","","0","","400"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr><tr><td>Password:</td><td>", password_field('password'), "</td></tr><tr><td align=\"center\" colspan=\"2\"> ", submit('Login'), "</td><td>", submit('Create New Account'), "</td></tr></table>", end_form;
+	return <<eof;
+      <form class="form-signin" method="post" >
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input type="text" class="form-control" name="login" placeholder="Username" autofocus><p>
+        <input type="password" class="form-control" name="password" placeholder="Password">
+        <label class="checkbox" >
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+
+    </div>
+eof
+#	return start_form, begin_table("","","0","","400"), "<tr><td>Login:</td><td>", textfield('login'), "</td></tr><tr><td>Password:</td><td>", password_field('password'), "</td></tr><tr><td align=\"center\" colspan=\"2\"> ", submit('Login'), "</td><td>", submit('Create New Account'), "</td></tr></table>", end_form;
 }
 
 # simple search form
@@ -133,11 +146,10 @@ Content-Type: text/html
 <html lang="en">
 <head>
 <title>mekong.com.au</title>
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 <link rel="stylesheet" type="text/css" href="table.css" media="screen" />
 </head>
-<body bgcolor="#E6E6FA">
-<p>
-<div class="container">
 eof
 }
 
@@ -146,12 +158,12 @@ eof
 #
 sub page_trailer() {
 	my $debugging_info = "";
-		if (defined param('debug')) { $debugging_info = debugging_info(); }
-	
+	#if (defined param('debug')) { $debugging_info = debugging_info(); }
+	$debugging_info = debugging_info();
 	return <<eof;
 	$debugging_info
 	</div>
-<body>
+</body>
 </html>
 eof
 }
@@ -175,7 +187,30 @@ $params
 eof
 }
 
-
+sub print_navbar {
+	return <<eof;
+<div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+<div class="container">
+eof
+}
 
 
 ###
