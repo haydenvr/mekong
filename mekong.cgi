@@ -54,6 +54,7 @@ sub cgi_main {
 		}
 	} elsif (defined $search_terms) {
 		print page_header("signin.css");
+		print search_form();
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
@@ -147,7 +148,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return start_form, "<div class=\"table\">",begin_table, $descriptions, "</table></div>", end_form;
+	return start_form, "<div class=\"container\">",begin_table, $descriptions, "</table></div>", end_form;
 }
 
 #
@@ -901,10 +902,13 @@ sub print_books(@) {
 sub get_book_descriptions {
 	my @isbns = @_;
 	my $descriptions = <<eof;
-<div class="row" align="center">
-<div class="col-md-4"> Image</div>
-<div class="col-md-4">Description</div>
-<div class="col-md-4">Price</div>
+<table class="table">
+<thead>
+<td><b>Image</td>
+<td><b>Description</td>
+<td><b>Price</td>
+</thead>
+<tbody>
 eof
 	our %book_details;
 	foreach $isbn (@isbns) {
@@ -916,14 +920,14 @@ eof
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
-<div class="col-md-4"><a href="$big_image" ><img src="$image" ></a></div> 
-<div class="col-md-4"><i>$title</i><br>$authors<br></div> 
-<div class="col-md-4">$book_details{$isbn}{price}<br>
+<tr><td><a href="$big_image" ><img src="$image" ></a></td> 
+<td><i>$title</i><br>$authors<br></td> 
+<td>$book_details{$isbn}{price}
 eof
 		$descriptions .= submit('Buy Me!','$isbn');
-		$descriptions .= "</div>\n";
+		$descriptions .= "</td></tr>\n";
 	}
-
+	$descriptions .= "</tbody></table>";
 	return $descriptions;
 }
 
