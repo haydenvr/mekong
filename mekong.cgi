@@ -57,7 +57,7 @@ sub cgi_main {
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
-			print page_header("table.css");
+			print page_header("signin.css");
 			print search_form();
 		} else {
 			print page_header("table.css");
@@ -133,7 +133,7 @@ sub search_form {
 <div class="container">
 <form class="ul-search" method="post" align="center" >
 <pre >Please enter a search term <br>
-<div class="input-group">
+<div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
   <input type="text" name="search_terms" class="form-control" placeholder="Search">
 </div>
@@ -165,7 +165,7 @@ Content-Type: text/html
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<title>mekong.com.au</title>
+<title>mekong</title>
  <!-- Bootstrap core CSS -->
     <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet">
 
