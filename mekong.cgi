@@ -53,14 +53,14 @@ sub cgi_main {
 			print newAccount();
 		}
 	} elsif (defined $search_terms) {
-		print page_header("table.css");
+		print page_header("signin.css");
 		print search_results($search_terms);			
 	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
 			print page_header("signin.css");
 			print search_form();
 		} else {
-			print page_header("table.css");
+			print page_header("signin.css");
 			print $last_error; #need to code this
 		}	
 	} else {
@@ -899,23 +899,32 @@ sub print_books(@) {
 
 # return descriptions of specified books in formatted table html
 sub get_book_descriptions {
-my @isbns = @_;
-my $descriptions = "<tr><td>Image</td><td>Description</td><td>Price</td></tr>\n";
-our %book_details;
-foreach $isbn (@isbns) {
-	die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
-	my $title = $book_details{$isbn}{title} || "";
-	my $authors = $book_details{$isbn}{authors} || "";
-	my $image = $book_details{$isbn}{smallimageurl} || "";
-	my $big_image = $book_details{$isbn}{largeimageurl} || "";
-	$authors =~ s/\n([^\n]*)$/ & $1/g;
-	$authors =~ s/\n/, /g;
-	$descriptions .= sprintf "<tr><td><a href=\"%s\" ><img src=\"%s\" ></a></td> <td><i>%s</i><br>%s<br></td> <td align=\"right\"><tt>%s<p>", $big_image,$image,$title, $authors,$book_details{$isbn}{price};
-	$descriptions .= submit('Buy Me!','$isbn');
-	$descriptions .= "</tt></td></tr>\n";
-}
+	my @isbns = @_;
+	my $descriptions = <<eof;
+<div class="row" align="center">
+<div class="col-md-4"> Image</div>
+<div class="col-md-4">Description</div>
+<div class="col-md-4">Price</div>
+eof
+	our %book_details;
+	foreach $isbn (@isbns) {
+		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
+		my $title = $book_details{$isbn}{title} || "";
+		my $authors = $book_details{$isbn}{authors} || "";
+		my $image = $book_details{$isbn}{smallimageurl} || "";
+		my $big_image = $book_details{$isbn}{largeimageurl} || "";
+		$authors =~ s/\n([^\n]*)$/ & $1/g;
+		$authors =~ s/\n/, /g;
+		$descriptions .= <<eof;
+<div class="col-md-4"><a href="$big_image" ><img src="$image" ></a></div> 
+<div class="col-md-4"><i>$title</i><br>$authors<br></div> 
+<div class="col-md-4">$book_details{$isbn}{price}<p>
+eof
+		$descriptions .= submit('Buy Me!','$isbn');
+		$descriptions .= "</div>\n";
+	}
 
-return $descriptions;
+	return $descriptions;
 }
 
 sub set_global_variables {
