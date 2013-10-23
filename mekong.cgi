@@ -916,6 +916,7 @@ eof
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
+<div class="row" align="center">
 <div class="col-md-4"><a href="$big_image" ><img src="$image" ></a></div> 
 <div class="col-md-4"><i>$title</i><br>$authors<br></div> 
 <div class="col-md-4">$book_details{$isbn}{price}<p>
