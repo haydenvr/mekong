@@ -76,8 +76,13 @@ sub cgi_main {
 		print page_header("signin.css");
 		print login_form();
 	}
-	
-	print page_trailer();
+	if (defined param('target')) {
+		$a = param('target');
+		print "The target is $a\n";
+	} else {
+		param('target',60);
+	}	
+	print start_form, hidden('target'), end_form, page_trailer();
 }
 
 sub create_New_User { 
@@ -138,8 +143,8 @@ eof
 sub keep_params {
 	my $to_print = start_form(); 
 	foreach $p (param()){
-		param($p, param($p));
-		$to_print .= hidden($p, param($p));
+		param("$p");
+		$to_print .= "the val is $p and ", hidden($p);
 	}
 	$to_print .= end_form();
 	return $to_print;
