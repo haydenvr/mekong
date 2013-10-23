@@ -27,8 +27,8 @@ exit 0;
 # search results at all
 
 sub cgi_main {
-	print page_header();
-	print print_navbar();
+	#print page_header();
+	#print print_navbar();
 #	print menu_print();
 	set_global_variables();
 	read_books($books_file);
@@ -59,6 +59,7 @@ sub cgi_main {
 		if (authenticate($login, $password)) { #need to code this
 			print search_form();
 		} else {
+			print page_header("signin.css");
 			print $last_error; #need to code this
 		}	
 	} else {
@@ -107,9 +108,10 @@ sub begin_table {
 # simple login form with password	
 sub login_form {
 	return <<eof;
-      <form class="form-signin" method="post" >
+      <div class="container">
+      <form class="form-signin" method="post" align="center" >
         <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="form-control" name="login" placeholder="Username" autofocus><p>
+        <input type="text" class="form-control" name="login" placeholder="Username" align="center" autofocus><p>
         <input type="password" class="form-control" name="password" placeholder="Password">
         <label class="checkbox" >
           <input type="checkbox" value="remember-me"> Remember me
@@ -139,6 +141,7 @@ sub search_results {
 # HTML at top of every screen
 #
 sub page_header() {
+	my $css_inc = $_[0];
 	return <<eof;
 Content-Type: text/html
 
@@ -148,8 +151,48 @@ Content-Type: text/html
 <title>mekong.com.au</title>
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
 <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
-<link rel="stylesheet" type="text/css" href="table.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="$css_inc" media="screen" />
 </head>
+<div class="container">
+
+      <!-- Static navbar -->
+      <div class="navbar navbar-default">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Mekong</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Search</a></li>
+            <li><a href="#">Cart</a></li>
+            <li><a href="#">Sign In</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="./">Default</a></li>
+            <li><a href="../navbar-static-top/">Static top</a></li>
+            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+
+    </div> <!-- /container -->
+
 eof
 }
 
