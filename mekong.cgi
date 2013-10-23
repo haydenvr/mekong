@@ -135,6 +135,17 @@ sub login_form {
 eof
 }
 
+# function to keep all the paramaters in each page
+sub keep_params {
+	my $to_print = start_form(); 
+	foreach $p (param()){
+		param($p, param($p));
+		$to_print .= hidden($p, param($p));
+	}
+	$to_print .= end_form();
+	return $to_print;
+}
+
 # simple search form
 sub search_form {
 	my $place_hold = $_[0] || "Search";
@@ -164,6 +175,7 @@ sub search_results {
 #
 sub page_header() {
 	my $css_inc = $_[0];
+	my $a = keep_params();
 	return <<eof;
 Content-Type: text/html
 
@@ -221,7 +233,7 @@ Content-Type: text/html
       </div>
 
     </div> <!-- /container -->
-
+$a
 eof
 }
 
@@ -248,7 +260,9 @@ sub debugging_info() {
 	foreach $p (param()) {
 		$params .= "param($p)=".param($p)."\n"
 	}
-
+	foreach $h (hidden()) {
+		$params .= "hidden($h)=".hidden($h)."\n";
+	}
 	return <<eof;
 <hr>
 <h4>Debugging information - parameter values supplied to $0</h4>
