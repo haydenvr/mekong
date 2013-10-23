@@ -59,10 +59,11 @@ sub cgi_main {
 		if (authenticate($login, $password)) { #need to code this
 			print search_form();
 		} else {
-			print page_header("signin.css");
+			
 			print $last_error; #need to code this
 		}	
 	} else {
+		print page_header("signin.css");
 		print login_form();
 	}
 	
