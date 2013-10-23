@@ -39,7 +39,14 @@ sub cgi_main {
 	my $create_new = param('Create New Account');
 	
 	if (defined $create_new) {
-		print newAccount();
+		my $username = param('username');
+		if (defined $username) {
+			if (create_New_User(param('username'),param('Password'),param('Name'),param('Street'),param('City'),param('State'),param('Postcode'),param('Email'))) {
+		print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
+			
+		} else {
+			print newAccount();
+		}
 	} elsif (defined $search_terms) {
 		print search_results($search_terms);			
 	} elsif (defined $login) {
@@ -56,7 +63,7 @@ sub cgi_main {
 }
 
 sub newAccount {
-	return "<div id=\"main\">", start_form, begin_table(), "<tr><td>Name</td><td>", textfield('Name'), "</td></tr><tr><td>Password</td><td>", textfield('Password'), "</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr></table>", end_form, "</div>";
+	return "<div id=\"main\">", start_form, begin_table("","center","0","Enter your Details","400"), "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", textfield('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table>", end_form, "</div>";
 }
 
 sub menu_print {
