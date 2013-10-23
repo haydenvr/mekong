@@ -41,9 +41,12 @@ sub cgi_main {
 	if (defined $create_new) {
 		my $username = param('username');
 		if (defined $username) {
-			if (create_New_User(param('username'),param('Password'),param('Name'),param('Street'),param('City'),param('State'),param('Postcode'),param('Email'))) {
-		print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
+			if (create_New_User()) {
+				print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
 			
+			} else {
+				print newAccount();
+			}
 		} else {
 			print newAccount();
 		}
@@ -60,6 +63,21 @@ sub cgi_main {
 	}
 	
 	print page_trailer();
+}
+
+sub create_New_User { 
+	my $user = param('username'), my $pass = param('Password'), my $name = param('Name');
+	my $street = param('Street'), my $city = param('City'), my $state = param('State');
+	my $postcode = param('Postcode'), my $email = param('Email');
+	if (legal_login($user)&&legal_password($pass)) {
+		open F, ">users/$user";
+		print <F> "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email";
+		close F;
+		return 1;
+	} else {
+		return 0;
+	}
+	
 }
 
 sub newAccount {
