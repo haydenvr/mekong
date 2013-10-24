@@ -33,11 +33,12 @@ sub cgi_main {
 #	print menu_print();
 	set_global_variables();
 	read_books($books_file);
-	my $login = param('login');
-	my $password = param('password');
+	my $login = param('login') || '';
+	my $password = param('password') || '';
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
 	my %template_variables = (
+	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">"
 	);
 	my $page = "login";
@@ -65,17 +66,17 @@ sub cgi_main {
 			print newAccount();
 		}
 	} elsif (param_used($search_terms)) {
-		print page_header("signin.css");
 		$template_variables{SEARCH_TERM} = $search_terms;
-		$template_variables{RESULT_TABLE} = search_results($search_terms);	
+		$template_variables{RESULT_TABLE} = search_results($search_terms);
 		$page = "search_form";
-	} elsif (param_used($login)) {
+	} elsif (defined $login) {
 		if (authenticate($login, $password)) { #need to code this
 			$page = "search";
 		} else {
 			print page_header("signin.css");
 			print $last_error; #need to code this
 		}	
+    }
 	# load HTML template from file
 	my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
 
@@ -86,6 +87,7 @@ sub cgi_main {
 
 sub param_used {
 	return ((defined $_[0])&&($_[0] ne ''));
+}
 
 sub create_New_User { 
 	my $user = param('username'), my $pass = param('Password'), my $name = param('Name');
@@ -161,7 +163,6 @@ sub search_form {
 <pre >Please enter a search term <br>
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
-  <input type="hidden" name="login" value="$login">
   <input type="text" name="search_terms" class="form-control" placeholder="$place_hold">
 </div>
 </pre>
@@ -174,7 +175,7 @@ sub search_results {
 	my ($search_terms) = @_;
 	my @matching_isbns = search_books($search_terms);
 	my $descriptions = get_book_descriptions(@matching_isbns);
-	return start_form, "<div class=\"container\">",begin_table, $descriptions, "</table></div>", end_form;
+    return $descriptions;
 }
 
 #

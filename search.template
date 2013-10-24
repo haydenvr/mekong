@@ -58,11 +58,12 @@ Content-Type: text/html
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
   <!input type="hidden" name="login" value="$login">
-  <input type="text" name="search_terms" class="form-control" placeholder="$place_hold">
+  <input type="text" name="search_terms" class="form-control" placeholder="Search">
   <TMPL_VAR NAME=HIDDEN_VARS>
 </div>
 </pre>
 </form></div>
+<TMPL_VAR NAME=CGI_PARAMS>
 </div>
 </body>
 </html>
