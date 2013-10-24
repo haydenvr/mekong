@@ -1,2 +1,11 @@
 Date    Start   Stop    Activity        
-22/10	10:20am	12:20am	added password checking, cleaned up presentation a bit with tables, formatted search results, mainly messing around with html to get used to it
+22/10	10:20am	12:20pm	added password checking, cleaned up presentation a bit with tables, formatted search results, mainly messing around with html to get used to it
+		2:50pm	4:20pm 	further formatting into table and fixing images
+		5:40pm	5:55pm	learning css
+		8:45pm	9:40pm	trying to implement css
+23/10	12:00pm	1:00pm	trying to improve graphics and made new account form
+		3:10pm	4:55pm	implemented bootstrap design (looks much better)
+		8:45pm	9:45pm	trying to implement basket but can't figure out hidden variables
+24/10 	10:00pm	11:10pm	implemented html module perl, got hidden variables working
+
+Total Time: 9hrs 35min
