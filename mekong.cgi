@@ -33,23 +33,26 @@ sub cgi_main {
 #	print menu_print();
 	set_global_variables();
 	read_books($books_file);
-	our $login = param('login');
+	my $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
-
+	my %template_variables = (
+		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">"
+	);
+	my $page = "login";
 	foreach $p (param()) {
 		if ($p =~ /^bought ([0-9]*)/) {
 			$isbn = $1;
-			$add_to_cart = $p;
+			my $add_to_cart = $p;
 		} 
 	}
-	if (defined $add_to_cart) {
+	if (param_used($add_to_cart)) {
 		print page_header("signin.css");
 		#need to add the $ISBN variable to cart
-	} elsif (defined $create_new) {
+	} elsif (param_used($create_new)) {
 		my $username = param('username');
-		if (defined $username) {
+		if (param_used($username)) {
 			if (create_New_User()) {
 				print page_header("signin.css");
 				print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
@@ -61,36 +64,28 @@ sub cgi_main {
 			print page_header("signin.css");
 			print newAccount();
 		}
-	} elsif (defined $search_terms) {
+	} elsif (param_used($search_terms)) {
 		print page_header("signin.css");
-		print search_form($search_terms);
-		print search_results($search_terms);			
-	} elsif (defined $login) {
+		$template_variables{SEARCH_TERM} = $search_terms;
+		$template_variables{RESULT_TABLE} = search_results($search_terms);	
+		$page = "search_form";
+	} elsif (param_used($login)) {
 		if (authenticate($login, $password)) { #need to code this
-			print page_header("signin.css");
-			print search_form();
+			$page = "search";
 		} else {
 			print page_header("signin.css");
 			print $last_error; #need to code this
 		}	
-	} else {
-		print page_header("signin.css");
-		print login_form();
-	}
-	if (defined param('target')) {
-		$a = param('target');
-		print "The target is $a\n";
-	} else {
-		param('target',60);
-	}	
-	print start_form, hidden('target'), end_form, page_trailer();
-# load HTML template from file
-my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
+	# load HTML template from file
+	my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
 
-# fill in template variables
-$template->param(%template_variables);
-print $template->output;
+	# fill in template variables
+	$template->param(%template_variables);
+	print $template->output;
 }
+
+sub param_used {
+	return ((defined $_[0])&&($_[0] ne ''));
 
 sub create_New_User { 
 	my $user = param('username'), my $pass = param('Password'), my $name = param('Name');

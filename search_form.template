@@ -1,0 +1,70 @@
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>mekong</title>
+ <!-- Bootstrap core CSS -->
+    <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="navbar.css" rel="stylesheet">	
+<link rel="stylesheet" type="text/css" href="signin.css" media="screen" />
+</head>
+<div class="container">
+
+      <!-- Static navbar -->
+      <div class="navbar navbar-default">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Mekong</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?search_terms=">Search</a></li>
+            <li><a href="#">Cart</a></li>
+            <li ><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="./">Default</a></li>
+            <li><a href="../navbar-static-top/">Static top</a></li>
+            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+<div class="container">
+<form class="ul-search" method="get" align="center" >
+<pre >Please enter a search term <br>
+<div class="input-group input-group-lg">
+  <span class="input-group-addon">@</span>
+  <!input type="hidden" name="login" value="$login">
+  <TMPL_VAR NAME=HIDDEN_VARS>
+  <input type="text" name="search_terms" class="form-control" placeholder=<TMPL_VAR NAME=SEARCH_TERM>>
+</div>
+</pre>
+</form></div>
+<! need to add search results here >
+ <TMPL_VAR NAME=RESULT_TABLE>
+</div>
+</body>
+</html>
