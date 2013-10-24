@@ -4,6 +4,7 @@
 # http://www.cse.unsw.edu.au/~cs2041/assignments/mekong/
 
 use CGI qw/:all/;
+use HTML::Template;
 
 $debug = 0;
 $| = 1;
@@ -32,7 +33,7 @@ sub cgi_main {
 #	print menu_print();
 	set_global_variables();
 	read_books($books_file);
-	my $login = param('login');
+	our $login = param('login');
 	my $password = param('password');
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
@@ -83,6 +84,12 @@ sub cgi_main {
 		param('target',60);
 	}	
 	print start_form, hidden('target'), end_form, page_trailer();
+# load HTML template from file
+my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
+
+# fill in template variables
+$template->param(%template_variables);
+print $template->output;
 }
 
 sub create_New_User { 
@@ -159,6 +166,7 @@ sub search_form {
 <pre >Please enter a search term <br>
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
+  <input type="hidden" name="login" value="$login">
   <input type="text" name="search_terms" class="form-control" placeholder="$place_hold">
 </div>
 </pre>
