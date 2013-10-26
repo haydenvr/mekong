@@ -35,16 +35,23 @@ sub cgi_main {
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
     my $add_to_basket = param('add_to_basket');
-	my %template_variables = (
+    our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
-		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">"
+		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
+        USER => "Not Logged In",
 	);
+    if (param_used($login)) { $template_variables{USER} = $login; }
 	my $page = "login";
 	if (param_used($add_to_basket)) {
-        add_basket($login,$add_to_basket);
-	 	$template_variables{SEARCH_TERM} = $add_to_basket;
-	 	$page = "search_form";
-		#need to add the $ISBN variable to cart
+        if ($template_variables{USER} ne "Not Logged In") {
+            add_basket($login,$add_to_basket);
+	 	    $template_variables{SEARCH_TERM} = $add_to_basket;
+	 	    $page = "search_form";
+		    #need to add the $ISBN variable to cart
+        } else {
+            $page = "error";
+            $template_variables{ERRORS} = "Not logged in, please log in";
+        }
 	} elsif (param_used($create_new)) {
 		my $username = param('username');
 		if (param_used($username)) {
@@ -52,6 +59,8 @@ sub cgi_main {
                 # need to code
             } else {
                 # display error
+                $page = "error";
+                $template_variables{ERRORS} = $last_error;
 			}
 		} else {
                 # print page to create new account
@@ -61,10 +70,12 @@ sub cgi_main {
 		$template_variables{RESULT_TABLE} = search_results($search_terms);
 		$page = "search_form";
 	} elsif (param_used($login)) {
-		if (authenticate($login, $password)) { #need to code this
+		if (authenticate($login, $password)) { 
 			$page = "search";
 		} else {
             # need page for error
+            $page = "error";
+            $template_variables{ERRORS} = "Error: $last_error";
 		}	
     }
 	# load HTML template from file
@@ -89,6 +100,7 @@ sub create_New_User {
 		close F;
 		return 1;
 	} else {
+        our $last_error = "Illegal username or password";
 		return 0;
 	}
 }
@@ -727,6 +739,8 @@ sub get_book_descriptions {
 	if (!defined @_) { return "\n"; } 
 	my @isbns = @_;
 	my $descriptions = <<eof;
+<form class="btn-group" method="get">
+$template_variables{HIDDEN_VARS} 
 <table class="table">
 <thead>
 <td><b>Image</td>
@@ -747,12 +761,12 @@ eof
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
 <td><i>$title</i><br>$authors<br></td><td>
-<form class="btn-group" method="get" ><button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button></form> 
+<button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
 <br><br>$book_details{$isbn}{price}</td></tr>
 eof
 		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
 	}
-	$descriptions .= "</tbody></table>";
+	$descriptions .= "</tbody></table></form>";
 	return $descriptions;
 }
 
