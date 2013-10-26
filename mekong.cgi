@@ -36,14 +36,19 @@ sub cgi_main {
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
     my $add_to_basket = param('add_to_basket');
+    my $remove = param('remove');
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
-        USER => "Not Logged In",
+        USER => "Not Logged In" 
 	);
     if (param_used($login)) { $template_variables{USER} = $login; }
 	my $page = "login";
-	if (param_used($add_to_basket)) {
+	if (param_used($remove)) {
+        delete_basket($login,$remove);
+        $page = "error";
+        $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif (param_used($add_to_basket)) {
         if ($template_variables{USER} ne "Not Logged In") {
             add_basket($login,$add_to_basket);
 	 	    $template_variables{SEARCH_TERM} = $add_to_basket;
@@ -54,8 +59,23 @@ sub cgi_main {
             $template_variables{ERRORS} = "Not logged in, please log in";
         }
 	} elsif ($action eq "Basket") {
-        $page = "error";
-        $template_variables{ERRORS} = "I should have taken you to your basket!\n";  
+        if (param_used($login)) {
+	        my @basket_isbns = read_basket($login);
+	        if (!@basket_isbns) {
+                $template_variables{BASKET} = "Your shopping basket is empty.\n";  
+	        } else {
+		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
+                $template_variables{BASKET} =~ s/Buy Me!/Remove/g;
+                $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
+                $template_variables{BASKET} =~ s/<b>Price/<b>Remove Book/;
+                my $amt_books = total_books(@basket_isbns);
+		        $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
+	        }
+            $page = "basket";
+        } else {
+            $page = "error";
+            $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
+        }
     } elsif ($action eq "Create New Account") {
 		my $username = param('username');
 		if (param_used($username)) {
@@ -368,7 +388,7 @@ sub read_basket {
 
 	close(F);
 	chomp(@isbns);
-	!$book_details{$_} && die "Internal error: unknown isbn $_ in basket\n" foreach @isbns;
+	#!$book_details{$_} && die "Internal error: unknown isbn $_ in basket\n" foreach @isbns;
 	return @isbns;
 }
 
@@ -735,7 +755,7 @@ sub orders_command {
 # print descriptions of specified books
 sub print_books(@) {
 	my @isbns = @_;
-	print get_book_descriptions(@isbns);
+	return get_book_descriptions(@isbns);
 }
 
 # return descriptions of specified books in formatted table html
@@ -775,25 +795,25 @@ eof
 }
 
 sub set_global_variables {
-$base_dir = ".";
-$books_file = "$base_dir/books.json";
-$orders_dir = "$base_dir/orders";
-$baskets_dir = "$base_dir/baskets";
-$users_dir = "$base_dir/users";
-$last_error = "";
-%user_details = ();
-%book_details = ();
-%attribute_names = ();
-@new_account_rows = (
-	  'login|Login:|10',
-	  'password|Password:|10',
-	  'name|Full Name:|50',
-	  'street|Street:|50',
-	  'city|City/Suburb:|25',
-	  'state|State:|25',
-	  'postcode|Postcode:|25',
-	  'email|Email Address:|35'
-	  );
+    $base_dir = ".";
+    $books_file = "$base_dir/books.json";
+    $orders_dir = "$base_dir/orders";
+    $baskets_dir = "$base_dir/baskets";
+    $users_dir = "$base_dir/users";
+    $last_error = "";
+    %user_details = ();
+    %book_details = ();
+    %attribute_names = ();
+    @new_account_rows = (
+	    'login|Login:|10',
+	    'password|Password:|10',
+	    'name|Full Name:|50',
+	    'street|Street:|50',
+	    'city|City/Suburb:|25',
+	    'state|State:|25',
+	    'postcode|Postcode:|25',
+	    'email|Email Address:|35'
+	);
 }
 
 

@@ -55,6 +55,9 @@ Content-Type: text/html
 <div class="container">
 <TMPL_VAR NAME=BASKET>
 </div>
+<div class="container">
+<TMPL_VAR NAME=AMT_BOOKS>
+</div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
 </body>
