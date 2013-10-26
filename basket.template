@@ -53,7 +53,7 @@ Content-Type: text/html
         </div><!--/.nav-collapse -->
       </div>
 <div class="container">
-<TMPL_VAR NAME=ERRORS>
+<TMPL_VAR NAME=BASKET>
 </div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
