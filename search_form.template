@@ -65,7 +65,7 @@ Content-Type: text/html
 </form></div>
 <! need to add search results here >
 <TMPL_VAR NAME=RESULT_TABLE> 
-<TMPL_VAR NAME=CGI_PARAMS>
+<!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
 </body>
 </html>

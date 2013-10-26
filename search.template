@@ -63,7 +63,7 @@ Content-Type: text/html
 </div>
 </pre>
 </form></div>
-<TMPL_VAR NAME=CGI_PARAMS>
+<!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
 </body>
 </html>

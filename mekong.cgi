@@ -28,53 +28,43 @@ exit 0;
 # search results at all
 
 sub cgi_main {
-	#print page_header();
-	#print print_navbar();
-#	print menu_print();
 	set_global_variables();
 	read_books($books_file);
 	my $login = param('login') || '';
 	my $password = param('password') || '';
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
+    my $add_to_basket = param('add_to_basket');
 	my %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">"
 	);
 	my $page = "login";
-	foreach $p (param()) {
-		if ($p =~ /^bought ([0-9]*)/) {
-			$isbn = $1;
-			my $add_to_cart = $p;
-		} 
-	}
-	if (param_used($add_to_cart)) {
-		print page_header("signin.css");
+	if (param_used($add_to_basket)) {
+        add_basket($login,$add_to_basket);
+	 	$template_variables{SEARCH_TERM} = $add_to_basket;
+	 	$page = "search_form";
 		#need to add the $ISBN variable to cart
 	} elsif (param_used($create_new)) {
 		my $username = param('username');
 		if (param_used($username)) {
 			if (create_New_User()) {
-				print page_header("signin.css");
-				print "Congratulations $username, your account has been created! <p> Please click here to login.\n";
-			} else {
-				print page_header("signin.css");
-				print newAccount();
+                # need to code
+            } else {
+                # display error
 			}
 		} else {
-			print page_header("signin.css");
-			print newAccount();
+                # print page to create new account
 		}
 	} elsif (param_used($search_terms)) {
 		$template_variables{SEARCH_TERM} = $search_terms;
 		$template_variables{RESULT_TABLE} = search_results($search_terms);
 		$page = "search_form";
-	} elsif (defined $login) {
+	} elsif (param_used($login)) {
 		if (authenticate($login, $password)) { #need to code this
 			$page = "search";
 		} else {
-			print page_header("signin.css");
-			print $last_error; #need to code this
+            # need page for error
 		}	
     }
 	# load HTML template from file
@@ -103,73 +93,6 @@ sub create_New_User {
 	}
 }
 
-sub newAccount {
-	return start_form, "<div class=\"container\">",begin_table, "<tr><td>Username</td><td>", textfield('username'), "</td></tr><tr><td>Password</td><td>", password_field('Password'), "</td></tr><tr><td>Name</td><td>", textfield('Name'),"</td></tr><tr><td>Street</td><td>", textfield('Street'),"</td></tr><tr><td>City</td><td>", textfield('City'),"</td></tr><tr><td>State</td><td>", textfield('State'),"</td></tr><tr><td>Postcode</td><td>", textfield('Postcode'),"</td></tr><tr><td>Email</td><td>", textfield('Email'), "</td></tr><tr><td align=\"center\" colspan=\"1\">", submit('Create New Account'), "</td></tr></table></div>", end_form;
-}
-
-sub menu_print {
-	return <<eof;
-<div id="leftcolumn"><a href="http://www.google.com.au/"><img src="data/label.png" alt="My logo"></a><p><ul><li>Coffee</li>	<li>Tea</li><li>Milk</li></ul></div>
-eof
-}
-
-# returns the beggining of a table
-sub begin_table {
-	my $color = "white", my $align = "center", my $border = "1", my $caption = ""; my $width = "800";
-	if (defined $_[0] && $_[0] ne '') { $color = $_[0]; }
-	if (defined $_[1] && $_[1] ne '') { $align = $_[1]; }
-	if (defined $_[2] && $_[2] ne '') { $border = $_[2]; }
-	if (defined $_[3] && $_[3] ne '') { $caption = $_[3]; }
-	if (defined $_[4] && $_[4] ne '') { $width = $_[4]; }
-	return "<table bgcolor=\"$color\" width=\"$width\" border=\"$border\" align=\"$align\"><caption>$caption</caption>";
-}
-
-# simple login form with password	
-sub login_form {
-	return <<eof;
-      <div class="container">
-      <form class="form-signin" method="post" align="center" >
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="form-control" name="login" placeholder="Username" align="center" autofocus><p>
-        <input type="password" class="form-control" name="password" placeholder="Password">
-        <label class="checkbox" >
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-	<button class="btn btn-lg btn-primary btn-block" type="submit" name="Create New Account" >Create New Account</button>
-      </form>
-
-    </div>
-eof
-}
-
-# function to keep all the paramaters in each page
-sub keep_params {
-	my $to_print = start_form(); 
-	foreach $p (param()){
-		param("$p");
-		$to_print .= "the val is $p and ", hidden($p);
-	}
-	$to_print .= end_form();
-	return $to_print;
-}
-
-# simple search form
-sub search_form {
-	my $place_hold = $_[0] || "Search";
-	return <<eof;
-<div class="container">
-<form class="ul-search" method="get" align="center" >
-<pre >Please enter a search term <br>
-<div class="input-group input-group-lg">
-  <span class="input-group-addon">@</span>
-  <input type="text" name="search_terms" class="form-control" placeholder="$place_hold">
-</div>
-</pre>
-</form></div>
-eof
-}
-
 # ascii display of search results
 sub search_results {
 	my ($search_terms) = @_;
@@ -177,135 +100,6 @@ sub search_results {
 	my $descriptions = get_book_descriptions(@matching_isbns);
     return $descriptions;
 }
-
-#
-# HTML at top of every screen
-#
-sub page_header() {
-	my $css_inc = $_[0];
-	my $a = keep_params();
-	return <<eof;
-Content-Type: text/html
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>mekong</title>
- <!-- Bootstrap core CSS -->
-    <link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="navbar.css" rel="stylesheet">	
-<link rel="stylesheet" type="text/css" href="$css_inc" media="screen" />
-</head>
-<div class="container">
-
-      <!-- Static navbar -->
-      <div class="navbar navbar-default">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Mekong</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?search_terms=">Search</a></li>
-            <li><a href="#">Cart</a></li>
-            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="./">Default</a></li>
-            <li><a href="../navbar-static-top/">Static top</a></li>
-            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-
-    </div> <!-- /container -->
-$a
-eof
-}
-
-#
-# HTML at bottom of every screen
-#
-sub page_trailer() {
-	my $debugging_info = "";
-	#if (defined param('debug')) { $debugging_info = debugging_info(); }
-	$debugging_info = debugging_info();
-	return <<eof;
-	$debugging_info
-	</div>
-</body>
-</html>
-eof
-}
-
-#
-# Print out information for debugging purposes
-#
-sub debugging_info() {
-	my $params = "";
-	foreach $p (param()) {
-		$params .= "param($p)=".param($p)."\n"
-	}
-	foreach $h (hidden()) {
-		$params .= "hidden($h)=".hidden($h)."\n";
-	}
-	return <<eof;
-<hr>
-<h4>Debugging information - parameter values supplied to $0</h4>
-<pre>
-$params
-</pre>
-<hr>
-eof
-}
-
-sub print_navbar {
-	return <<eof;
-<div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Project name</a>
-        </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
-<div class="container">
-eof
-}
-
 
 ###
 ### Below here are utility functions
@@ -953,9 +747,10 @@ eof
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
 <td><i>$title</i><br>$authors<br></td><td>
+<form class="btn-group" method="get" ><button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button></form> 
+<br><br>$book_details{$isbn}{price}</td></tr>
 eof
-		$descriptions .= submit("bought $isbn",'Buy Me!');
-		$descriptions .= "<br><br>$book_details{$isbn}{price}</td></tr>\n";
+		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
 	}
 	$descriptions .= "</tbody></table>";
 	return $descriptions;
