@@ -30,6 +30,7 @@ exit 0;
 sub cgi_main {
 	set_global_variables();
 	read_books($books_file);
+    my $action = param('action') || 'signin';
 	my $login = param('login') || '';
 	my $password = param('password') || '';
 	my $search_terms = param('search_terms');
@@ -52,7 +53,10 @@ sub cgi_main {
             $page = "error";
             $template_variables{ERRORS} = "Not logged in, please log in";
         }
-	} elsif (param_used($create_new)) {
+	} elsif ($action eq "Basket") {
+        $page = "error";
+        $template_variables{ERRORS} = "I should have taken you to your basket!\n";  
+    } elsif ($action eq "Create New Account") {
 		my $username = param('username');
 		if (param_used($username)) {
 			if (create_New_User()) {
@@ -69,7 +73,7 @@ sub cgi_main {
 		$template_variables{SEARCH_TERM} = $search_terms;
 		$template_variables{RESULT_TABLE} = search_results($search_terms);
 		$page = "search_form";
-	} elsif (param_used($login)) {
+	} elsif ($action eq "Authenticate") {
 		if (authenticate($login, $password)) { 
 			$page = "search";
 		} else {

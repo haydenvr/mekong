@@ -7,6 +7,6 @@ Date    Start   Stop    Activity
 		3:10pm	4:55pm	implemented bootstrap design (looks much better)
 		8:45pm	9:45pm	trying to implement basket but can't figure out hidden variables
 24/10 	10:00pm	11:10pm	implemented html module perl, got hidden variables working
-26/10   3:15pm          implementing basket
+26/10   3:15pm  4:20pm  implementing basket and added error page
 
-Total Time: 9hrs 35min
+Total Time: 10hrs 40min

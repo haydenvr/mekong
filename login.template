@@ -29,7 +29,7 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?search_terms=">Search</a></li>
+            <li><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Search>Search</a></li>
             <li><a href="#">Cart</a></li>
             <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
             <li class="dropdown">
@@ -46,7 +46,7 @@ Content-Type: text/html
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="./">Default</a></li>
+            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Basket" >Basket</a></li>
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
@@ -63,8 +63,8 @@ Content-Type: text/html
           <input type="checkbox" value="remember-me"> Remember me
         </label>
 		<TMPL_VAR NAME=HIDDEN_VARS>.
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-	<button class="btn btn-lg btn-primary btn-block" type="submit" name="Create New Account" >Create New Account</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Authenticate">Sign in</button>
+	<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Create New Account" >Create New Account</button>
       </form>
 
     </div>

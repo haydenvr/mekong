@@ -1,4 +1,3 @@
-
 Content-Type: text/html
 
 <!DOCTYPE html>
@@ -30,7 +29,7 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?search_terms=">Search</a></li>
+            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action="Search">Search</a></li>
             <li><a href="#">Cart</a></li>
             <li ><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
             <li class="dropdown">
@@ -47,7 +46,7 @@ Content-Type: text/html
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="./">Default</a></li>
+            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Basket" >Basket</a></li>
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
@@ -58,7 +57,7 @@ Content-Type: text/html
 <pre >Please enter a search term <br>
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
-  <!input type="hidden" name="login" value="$login">
+  <input type="hidden" name="action" value="Search">
   <input type="text" name="search_terms" class="form-control" placeholder="Search">
   <TMPL_VAR NAME=HIDDEN_VARS>
 </div>
