@@ -50,6 +50,28 @@ sub cgi_main {
         delete_basket($login,$remove);
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif ($action eq "Checkedout") {
+        if ((legal_credit_card_number(param('CCnum')))&&(legal_expiry_date(param('CCexp')))) {
+            finalize_order($login,param('CCnum'),param('CCexp'));
+            $page = "error";
+            $template_variables{ERRORS} = "Congrats! Your order is now being processed.\n";  
+        } else {
+            $page = "error";
+            $template_variables{ERRORS} = $last_error;
+        }
+    } elsif ($action eq "Check Orders") {
+        if (param_used($login)) {
+            my $orders;
+            my @tmp;
+            foreach $or (login_to_orders($login)) {
+                @tmp = read_order($or);
+                $template_variables{ERRORS} .= "Order at ".convert_time($tmp[0])."<p>\n";
+            }
+            $page = "error"; 
+        } else {
+            $template_variables{ERRORS} = "Error: You need to be logged in to view your previous orders\n";
+            $page = "error"; 
+        }
     } elsif ($action eq "View") {
         my $book = param('book');
         $page = "book_info";
@@ -108,9 +130,10 @@ sub cgi_main {
             $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
         }
     } elsif ($action eq "Create New Account") {
-		my $username = param('username');
-		if (param_used($username)) {
-			if (create_New_User()) {
+		if (param_used(param('Name'))) {
+			if (create_new_user()) {
+                $page = "error";
+                $template_variables{ERRORS} = "Congrats! Account creation successful!\n";
                 # need to code
             } else {
                 # display error
@@ -119,6 +142,7 @@ sub cgi_main {
 			}
 		} else {
                 # print page to create new account
+                $page = "create_new";
 		}
 	} elsif (param_used($search_terms)) {
 		$template_variables{SEARCH_TERM} = $search_terms;
@@ -147,17 +171,27 @@ sub param_used {
 	return ((defined $_[0])&&($_[0] ne ''));
 }
 
-sub create_New_User { 
-	my $user = param('username'), my $pass = param('Password'), my $name = param('Name');
+sub convert_time {
+    use POSIX qw(strftime);
+    $now_string = strftime "%a %b %e %H:%M:%S %Y", localtime($_[0]);
+    return $now_string;
+}
+
+sub create_new_user { 
+	my $user = param('Username'), my $pass = param('Password'), my $name= param('Name');
 	my $street = param('Street'), my $city = param('City'), my $state = param('State');
 	my $postcode = param('Postcode'), my $email = param('Email');
-	if (legal_login($user)&&legal_password($pass)) {
-		open F, ">users/$user";
-		print F "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email";
-		close F;
-		return 1;
+	if ((legal_login($user))&&(legal_password($pass))) {
+        if (-e "users/$user") {
+            our $last_error = "Username already taken. Choose another name.\n";
+            return 0;
+        } else {
+		    open F, ">users/$user";
+		    print F "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email\n";
+		    close F;
+		    return 1;
+        }
 	} else {
-        our $last_error = "Illegal username or password";
 		return 0;
 	}
 }
