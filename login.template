@@ -33,10 +33,10 @@ Content-Type: text/html
             <TMPL_VAR NAME=HIDDEN_VARS>
           <ul class="nav navbar-nav">
             <li>
-                <a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Search">Search</a>
+                <a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search>Search</a>
             </li>
             <li><a href="#">Cart</a></li>
-            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -51,7 +51,7 @@ Content-Type: text/html
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Basket" >Basket</a></li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket" >Basket</a></li>
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>

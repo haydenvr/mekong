@@ -2,6 +2,7 @@
 # written by andrewt@cse.unsw.edu.au October 2013
 # as a starting point for COMP2041 assignment 2
 # http://www.cse.unsw.edu.au/~cs2041/assignments/mekong/
+# NEED TO FIX: all urls that refer to other pages using hwav057
 
 use CGI qw/:all/;
 use HTML::Template;
@@ -40,7 +41,8 @@ sub cgi_main {
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
-        USER => "Not Logged In" 
+        USER => "Not Logged In",
+        PATH_TO_SITE => CGI->new->url() 
 	);
     if (param_used($login)) { $template_variables{USER} = $login; }
 	my $page = "login";
