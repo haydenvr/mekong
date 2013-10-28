@@ -52,8 +52,14 @@ sub cgi_main {
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
     } elsif ($action eq "View") {
         my $book = param('book');
-        $page = "error";
-        $template_variables{ERRORS} =  get_full_info($book);  
+        $page = "book_info";
+        our %book_details;
+        $template_variables{ISBN} = $book;  
+        $template_variables{IMG_SOURCE} = $book_details{$book}{largeimageurl} || "";
+		$template_variables{BOOK_NAME} = $book_details{$book}{title} || "";
+        $template_variables{BOOK_INFO} = $book_details{$book}{productdescription} || "";
+		$template_variables{AUTHOR} = $book_details{$book}{authors} || "";
+		$template_variables{PRICE} = $book_details{$book}{price} || "";
     } elsif ($action eq "Checkout") {
         if (param_used($login)) {
 	        my @basket_isbns = read_basket($login);
@@ -94,7 +100,7 @@ sub cgi_main {
                 $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
                 $template_variables{BASKET} =~ s/<b>Price/<b>Remove Book/;
                 my $amt_books = total_books(@basket_isbns);
-		        $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
+		        $template_variables{AMT_BOOKS} = "Total Price: \$".$amt_books."aud.\n";
 	        }
             $page = "basket";
         } else {

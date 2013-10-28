@@ -31,7 +31,7 @@ Content-Type: text/html
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li>
-                <form name=Basket action=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket" method="post">
+                <form name=Basket action=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket method="post">
                     <TMPL_VAR NAME=HIDDEN_VARS>
                 </form>
             </li>
@@ -52,7 +52,7 @@ Content-Type: text/html
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket" >Basket</a></li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket >Basket</a></li>
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
