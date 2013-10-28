@@ -16,7 +16,8 @@ Content-Type: text/html
 <link rel="stylesheet" type="text/css" href="signin.css" media="screen" />
 </head>
 <div class="container">
-
+	<form class="navbar navbar-default" method="post">
+	<TMPL_VAR NAME=HIDDEN_VARS>
       <!-- Static navbar -->
       <div class="navbar navbar-default">
         <div class="navbar-header">
@@ -46,12 +47,13 @@ Content-Type: text/html
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket" >Basket</a></li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket >Basket</a></li>
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
         </div><!--/.nav-collapse -->
-      </div>
+		</form>
+    </div>
 <div class="container">
 <TMPL_VAR NAME=BASKET>
 </div>
@@ -60,7 +62,7 @@ Content-Type: text/html
 </div>
 <div class="container">
       <form class="form-signin" method="post" align="right" >
-		<TMPL_VAR NAME=HIDDEN_VARS>.
+		<TMPL_VAR NAME=HIDDEN_VARS>
         <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Checkout">Checkout</button>
       </form>
 

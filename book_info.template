@@ -16,7 +16,8 @@ Content-Type: text/html
 <link rel="stylesheet" type="text/css" href="signin.css" media="screen" />
 </head>
 <div class="container">
-
+	<form class="navbar navbar-default" method="post">
+	<TMPL_VAR NAME=HIDDEN_VARS>
       <!-- Static navbar -->
       <div class="navbar navbar-default">
         <div class="navbar-header">
@@ -27,16 +28,11 @@ Content-Type: text/html
           </button>
           <a class="navbar-brand" href="#">Mekong</a>
         </div>
-        
         <div class="navbar-collapse collapse">
-        <form class="navbar-collapse collapse" method="post">
-            <TMPL_VAR NAME=HIDDEN_VARS>
           <ul class="nav navbar-nav">
-            <li>
-                <a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search>Search</a>
-            </li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>action=Search >Search</a></li>
             <li><a href="#">Cart</a></li>
-            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -55,11 +51,9 @@ Content-Type: text/html
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
-        </form>
         </div><!--/.nav-collapse -->
-      </div>
-
-    </div> <!-- /container -->
+		</form>
+    </div>
 <div class="container">
 <div class="media">
   <a class="pull-left" href="#">
