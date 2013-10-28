@@ -10,6 +10,7 @@ Date    Start   Stop    Activity
 26/10   3:15pm  4:20pm  implementing basket and added error page
         5:10pm  6:25pm  got basket fully working and then added remove from basket functionality
 28/10   12:00pm 1:30pm  started working on implementing the checkout form
-        4:00pm          fixed urls to pages
+        4:00pm  5:40pm  fixed urls to pages, added full page bookinfo, fixed some forms
+        7:30pm          trying to fix navbar links
 
-Total Time: 13hrs 25min
+Total Time: 15hrs 05min

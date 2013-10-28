@@ -30,7 +30,7 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active" method="post"><a href=<TMPL_VAR NAME=PATH_TO_SITE>action=Search >Search</a></li>
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search&login=<TMPL_VAR NAME=USER> >Search</a></li>
             <li><a href="#">Cart</a></li>
             <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
             <li class="dropdown">
