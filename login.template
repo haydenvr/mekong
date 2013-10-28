@@ -27,9 +27,14 @@ Content-Type: text/html
           </button>
           <a class="navbar-brand" href="#">Mekong</a>
         </div>
+        
         <div class="navbar-collapse collapse">
+        <form class="navbar-collapse collapse" method="post">
+            <TMPL_VAR NAME=HIDDEN_VARS>
           <ul class="nav navbar-nav">
-            <li><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Search>Search</a></li>
+            <li>
+                <a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi?action=Search">Search</a>
+            </li>
             <li><a href="#">Cart</a></li>
             <li class="active"><a href="http://cgi.cse.unsw.edu.au/~hwav057/mekong/mekong.cgi">Sign In</a></li>
             <li class="dropdown">
@@ -50,6 +55,7 @@ Content-Type: text/html
             <li><a href="../navbar-static-top/">Static top</a></li>
             <li><a href="../navbar-fixed-top/">Fixed top</a></li>
           </ul>
+        </form>
         </div><!--/.nav-collapse -->
       </div>
 

@@ -48,6 +48,25 @@ sub cgi_main {
         delete_basket($login,$remove);
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif ($action eq "Checkout") {
+        if (param_used($login)) {
+	        my @basket_isbns = read_basket($login);
+	        if (!@basket_isbns) {
+                $template_variables{BASKET} = "Your shopping basket is empty.\n";  
+	        } else {
+		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
+                $template_variables{BASKET} =~ s/Buy Me!/Remove/g;
+                $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
+                $template_variables{BASKET} =~ s/<b>Price/<b>Remove Book/;
+                my $amt_books = total_books(@basket_isbns);
+		        $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
+	        }
+            $page = "checkout";
+        } else {
+            $page = "error";
+            $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
+        }
+        $template_variables{ERRORS} = "Hey buddy";
     } elsif (param_used($add_to_basket)) {
         if ($template_variables{USER} ne "Not Logged In") {
             add_basket($login,$add_to_basket);
@@ -101,6 +120,8 @@ sub cgi_main {
             $page = "error";
             $template_variables{ERRORS} = "Error: $last_error";
 		}	
+    } elsif ($action eq "Search") {
+        $page = "search";
     }
 	# load HTML template from file
 	my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
@@ -756,6 +777,42 @@ sub orders_command {
 sub print_books(@) {
 	my @isbns = @_;
 	return get_book_descriptions(@isbns);
+}
+
+# return book descriptions for basket
+sub get_book_basket {
+	if (!defined @_) { return "\n"; } 
+	my @isbns = @_;
+	my $descriptions = <<eof;
+<form class="btn-group" method="get" align="center">
+$template_variables{HIDDEN_VARS} 
+<table class="table" align="center">
+<thead>
+<td><b>Image</td>
+<td><b>Description</td>
+<td><b>Price</td>
+</thead>
+<tbody>
+eof
+	our %book_details;
+	foreach $isbn (@isbns) {
+		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
+		my $title = $book_details{$isbn}{title} || "";
+		my $authors = $book_details{$isbn}{authors} || "";
+		my $image = $book_details{$isbn}{smallimageurl} || "";
+		my $big_image = $book_details{$isbn}{largeimageurl} || "";
+		$authors =~ s/\n([^\n]*)$/ & $1/g;
+		$authors =~ s/\n/, /g;
+		$descriptions .= <<eof;
+<tr><td><a href="$big_image" ><img src="$image" ></a></td> 
+<td><i>$title</i><br>$authors<br></td><td>
+<button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
+<br><br>$book_details{$isbn}{price}</td></tr>
+eof
+		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
+	}
+	$descriptions .= "</tbody></table></form>";
+	return $descriptions;
 }
 
 # return descriptions of specified books in formatted table html

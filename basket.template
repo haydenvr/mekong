@@ -58,6 +58,14 @@ Content-Type: text/html
 <div class="container">
 <TMPL_VAR NAME=AMT_BOOKS>
 </div>
+<div class="container">
+      <form class="form-signin" method="post" align="right" >
+		<TMPL_VAR NAME=HIDDEN_VARS>.
+        <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Checkout">Checkout</button>
+      </form>
+
+    </div>
+</div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
 </body>
