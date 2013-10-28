@@ -50,6 +50,10 @@ sub cgi_main {
         delete_basket($login,$remove);
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif ($action eq "View") {
+        my $book = param('book');
+        $page = "error";
+        $template_variables{ERRORS} =  get_full_info($book);  
     } elsif ($action eq "Checkout") {
         if (param_used($login)) {
 	        my @basket_isbns = read_basket($login);
@@ -817,6 +821,42 @@ eof
 	return $descriptions;
 }
 
+# this returns a info page about the book. note that it is full page
+sub get_full_info {
+	if (!defined @_) { return "\n"; } 
+	my @isbns = @_;
+	my $descriptions = <<eof;
+<form class="btn-group" method="get">
+$template_variables{HIDDEN_VARS} 
+<table class="table">
+<thead>
+<td><b>Image</td>
+<td><b>Description</td>
+<td><b>Price</td>
+</thead>
+<tbody>
+eof
+	our %book_details;
+	foreach $isbn (@isbns) {
+		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
+		my $title = $book_details{$isbn}{title} || "";
+		my $authors = $book_details{$isbn}{authors} || "";
+		my $image = $book_details{$isbn}{smallimageurl} || "";
+		my $big_image = $book_details{$isbn}{largeimageurl} || "";
+		$authors =~ s/\n([^\n]*)$/ & $1/g;
+		$authors =~ s/\n/, /g;
+		$descriptions .= <<eof;
+<tr><td><a href="$big_image" ><img src="$image" ></a></td> 
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
+<button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
+<br><br>$book_details{$isbn}{price}</td></tr>
+eof
+		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
+	}
+	$descriptions .= "</tbody></table></form>";
+	return $descriptions;
+}
+
 # return descriptions of specified books in formatted table html
 sub get_book_descriptions {
 	if (!defined @_) { return "\n"; } 
@@ -843,7 +883,7 @@ eof
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
-<td><i>$title</i><br>$authors<br></td><td>
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
 <button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
 <br><br>$book_details{$isbn}{price}</td></tr>
 eof

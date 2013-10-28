@@ -9,5 +9,7 @@ Date    Start   Stop    Activity
 24/10 	10:00pm	11:10pm	implemented html module perl, got hidden variables working
 26/10   3:15pm  4:20pm  implementing basket and added error page
         5:10pm  6:25pm  got basket fully working and then added remove from basket functionality
+28/10   12:00pm 1:30pm  started working on implementing the checkout form
+        4:00pm          fixed urls to pages
 
-Total Time: 11hrs 55min
+Total Time: 13hrs 25min
