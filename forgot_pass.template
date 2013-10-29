@@ -57,10 +57,11 @@ Content-Type: text/html
     </div>
 <div class="container" align="center">
 <form class="btn-group" method="post" align="center">
+<TMPL_VAR NAME=KEEP_PARAMS>
 <table class="table" >
-<tr><td>Enter your Username</td><td><div class="input-group"> <input type="text" name="login" class="form-control"></div></td></tr>
+<tr><td><TMPL_VAR NAME=PROMPT></td><td><div class="input-group"> <input type="text" name="<TMPL_VAR NAME=VARIABLE>" class="form-control"></div></td></tr>
 </table>
-<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Forgot Password">Submit</button>
+<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="<TMPL_VAR NAME=VALUE>">Submit</button>
 </form>
     </div>
 </div>

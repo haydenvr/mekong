@@ -50,13 +50,43 @@ sub cgi_main {
         delete_basket($login,$remove);
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif ($action eq "reset_pass") {
+        $page = "error";
+        if (param_used(param('new_pass'))) {
+            my $id = param('id');
+            my $user = param('login');
+            if (($user eq $id)&&(change_pass(param('login'),param('new_pass')))) {
+                $template_variables{ERRORS} = "Congratulations, your password has been changed.";
+                remove_first_occurence($id, "users/forgot");
+            } else {
+                $template_variables{ERRORS} = "Change was not successful.";
+            }
+        } else {
+            my $user = handle_reset(param('id'));
+            my $id = param('id');
+            if ($user ne "No") {
+                $page = "forgot_pass";
+                $template_variables{PROMPT} = "Enter your new password";
+                $template_variables{VARIABLE} = "new_pass";
+                $template_variables{VALUE} = "reset_pass";
+                $template_variables{KEEP_PARAMS} = "<input type=\"hidden\" name=\"login\" value=\"$user\"><input type=\"hidden\" name=\"id\" value=\"$id\">";
+            } else {
+                $template_variables{ERRORS} = "Need to provide valid id.";
+            }
+        }
     } elsif ($action eq "Forgot Password") {
         if (param_used($login)) {
             $page = "error";
-            $template_variables{ERRORS} = "A link to reset your password has been sent to your email.";
+            if (handle_forgot_pass($login)) {
+                $template_variables{ERRORS} = "A link to reset your password has been sent to your email.";
+            } else { 
+                $template_variables{ERRORS} = $last_error;
+            }
         } else {
-            $page = "error";
-            $template_variables{ERRORS} = "Congratulations, you are now dumber than I thought";  
+            $page = "forgot_pass";
+            $template_variables{PROMPT} = "Enter Username";
+            $template_variables{VARIABLE} = "login";
+            $template_variables{VALUE} = "Forgot Password";
         }
     } elsif ($action eq "Checkedout") {
         if ((legal_credit_card_number(param('CCnum')))&&(legal_expiry_date(param('CCexp')))) {
@@ -108,7 +138,6 @@ sub cgi_main {
             $page = "error";
             $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
         }
-        $template_variables{ERRORS} = "Hey buddy";
     } elsif (param_used($add_to_basket)) {
         if (authenticate($login,$password)) {
             add_basket($login,$add_to_basket);
@@ -188,12 +217,41 @@ sub cgi_main {
 	print $template->output;
 }
 
+# changes the password of a particular user
+sub change_pass {
+    (my $user, my $new_pass) = @_;
+    our $last_error;
+    if (legal_login($user)) {
+        remove_first_occurence("password","users/$user");
+        open F, ">>users/$user" or die;
+        print F "password\=$new_pass\n";
+        close F;
+        return 1;
+    } else {
+        $last_error = "Username is not valid";
+        return 0;
+    }
+}
+
 # takes unique id and finds the related user. changes account permissions to full user.
 sub confirm_user_creation {
     my $id = $_[0];
     my $dir = 'users/to_confirm';
     return 0 if (!remove_first_ocurrence($id,$dir));
     return 1;
+}
+
+# takes unique id and finds the related user
+sub handle_reset {
+    my $id = $_[0];
+    use List::Util 'first';
+    open F, "users/forgot" or die;
+    my @lines = <F>;
+    my $user = first { /$id/ } @lines;
+    if (defined $user) {
+        $user =~ s/\=.+$//;
+        return $user;
+    } else { return "NO"; }
 }
 
 # removes the line containing first ocurrence of $word in $file
@@ -238,22 +296,52 @@ eof
     $mailer->close();
 }
 
+# adds entry to user data to allow for password change
+# sends email to user so they can change it 
+sub handle_forgot_pass {
+    our $last_error;
+    if (legal_login($_[0]) && open F, "users/$_[0]") {
+        my @lines = <F>;
+        close F;
+        my $email = '';
+        foreach $line (@lines) {
+            chomp $line;
+            if ($line =~ /^email\=([^\@]+\@.+$)/) { $email = $1; }
+        }
+        if (!param_used($email)) {
+            $last_error = "Email does not exist<p>@lines";
+            return 0;
+        }
+        open F, ">>users/$_[0]" or die;
+        my $unique_id = create_rand();
+        print F "forgot\=$unique_id\n";
+        close F;
+        open F, ">>users/forgot" or die;
+        print F "$_[0]\=$unique_id\n";
+        close F;
+        send_forgot_password($email,$unique_id);
+        return 1;
+    } else {
+        $last_error = "User does not exist";
+        return 0;
+    }
+}
+
 # sends a password change form to users email
 sub send_forgot_password {
+    (my $to_address, my $unique_id) = @_;
     use Mail::Mailer;
 
     my $from_address = "mekong";
-    my $to_address = $_[0];
     my $subject = "Reset Password";
-    my $unique_id = create_rand();
     my $body = <<eof;
-Please click <$template_variables{PATH_TO_SITE}?action=reset_pass&id=$unique_id>here to confirm your account.
+($to_address) Please go to $template_variables{PATH_TO_SITE}?action=reset_pass&id=$unique_id to change your password.
 eof
 
     my $mailer = Mail::Mailer->new("sendmail");
     $mailer->open({ 
             From    => $from_address,
-            To      => $to_address,
+            To      => "hwav057\@cse.unsw.edu.au",
             Subject => $subject,
     }); 
     print $mailer $body;
@@ -320,7 +408,7 @@ sub search_results {
 sub legal_login {
 	my ($login) = @_;
 	our ($last_error);
-    if ($login eq 'to_confirm') { 
+    if ($login eq 'to_confirm' || $login eq 'forgot') { 
         $last_error = "login '$login': not legal login."; 
         return 0; }
 	if ($login !~ /^[a-zA-Z][a-zA-Z0-9]*$/) {
