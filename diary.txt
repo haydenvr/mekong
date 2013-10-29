@@ -11,6 +11,7 @@ Date    Start   Stop    Activity
         5:10pm  6:25pm  got basket fully working and then added remove from basket functionality
 28/10   12:00pm 1:30pm  started working on implementing the checkout form
         4:00pm  5:40pm  fixed urls to pages, added full page bookinfo, fixed some forms
-        7:30pm          trying to fix navbar links
+        7:30pm  10:15pm trying to fix navbar links, added ordering, started reading orders, fixed create_user
+29/10   4:00pm  5:50pm  implemented most of email confirmation, just fixing final creation of user account 
 
-Total Time: 15hrs 05min
+Total Time: 19hrs 40min

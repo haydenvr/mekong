@@ -131,20 +131,33 @@ sub cgi_main {
         }
     } elsif ($action eq "Create New Account") {
 		if (param_used(param('Name'))) {
-			if (create_new_user()) {
-                $page = "error";
-                $template_variables{ERRORS} = "Congrats! Account creation successful!\n";
-                # need to code
+            my $user = param('Username');
+            $page = "error";
+            my $rand = create_rand();
+            my @to_pass = ($rand, param('Username'), param('Password'), param('Name'), param('Street'));
+            push(@to_pass, (param('City'), param('State'),param('Postcode'),param('Email')));
+            if (create_new_user(@to_pass)) {
+                send_confirm(param('Email'),$rand);
+                $template_variables{ERRORS} = "Please check your email for a confirmation.\n";
             } else {
-                # display error
-                $page = "error";
                 $template_variables{ERRORS} = $last_error;
-			}
-		} else {
+            }
+        } else {
                 # print page to create new account
                 $page = "create_new";
 		}
-	} elsif (param_used($search_terms)) {
+	} elsif ($action eq "confirm") {
+        $page = "error";
+        if (param_used(param('id'))) {
+            if (confirm_user_creation(param('id'))) {
+                $template_variables{ERRORS} = "Congratulations, your account has now been confirmed. You may now login.";
+            } else {
+                $template_variables{ERRORS} = "Error ocurred when confirming email.";
+            }    
+        } else {
+            $template_variables{ERRORS} = "Error: Need unique ID to confirm user creation.";
+        }
+    } elsif (param_used($search_terms)) {
 		$template_variables{SEARCH_TERM} = $search_terms;
 		$template_variables{RESULT_TABLE} = search_results($search_terms);
 		$page = "search_form";
@@ -167,10 +180,90 @@ sub cgi_main {
 	print $template->output;
 }
 
+# takes unique id and finds the related user. changes account permissions to full user.
+sub confirm_user_creation {
+    my $id = $_[0];
+    my $dir = 'users/';
+    my $to_keep = '';
+    my @files_lines;
+    opendir(DIR,$dir) or die $!;
+    #while (my $file = readdir(DIR)) {
+    #    next if ($file =~ m/^\./);
+    #    open F, $file or die;
+    #    my @lines = <F>;
+    #    if ($lines[0] eq "id\=$id") {
+    #        $to_keep = $file;
+    #        @files_lines = @lines;
+    #        shift @files_lines;
+    #    }
+    #    close F;
+    #}
+    closedir(DIR);
+    #open F, ">$to_keep" or return 0;
+    #for $line (@files_lines) {
+    #    print F $line;
+    #}
+    return 1;
+}
+
+# creates id for confirming account and sends email
+sub send_confirm {
+    use Mail::Mailer;
+
+    my $from_address = "mekong";
+    my $to_address = $_[0];
+    my $subject = "Confirm account creation";
+    my $unique_id = $_[1];
+    my $body = <<eof;
+Please go to $template_variables{PATH_TO_SITE}?action=confirm&id=$unique_id to confirm your account.
+eof
+
+    my $mailer = Mail::Mailer->new("sendmail");
+    $mailer->open({ 
+            From    => $from_address,
+            To      => $to_address,
+            Subject => $subject,
+    }); 
+    print $mailer $body;
+    $mailer->close();
+}
+
+# sends a password change form to users email
+sub send_forgot_password {
+    use Mail::Mailer;
+
+    my $from_address = "mekong";
+    my $to_address = $_[0];
+    my $subject = "Reset Password";
+    my $unique_id = create_rand();
+    my $body = <<eof;
+Please click <$template_variables{PATH_TO_SITE}?action=reset_pass&id=$unique_id>here to confirm your account.
+eof
+
+    my $mailer = Mail::Mailer->new("sendmail");
+    $mailer->open({ 
+            From    => $from_address,
+            To      => $to_address,
+            Subject => $subject,
+    }); 
+    print $mailer $body;
+    $mailer->close();
+}
+
+# creates a relatively large random number
+sub create_rand {
+    my $range = 900000000000;
+    my $offset = 100000000000;
+    my $random_number = int(rand($range)) + $offset;
+    return $random_number;
+}
+
+# checks if param has been defined and isn't just empty
 sub param_used {
 	return ((defined $_[0])&&($_[0] ne ''));
 }
 
+# converts seconds since 1st Jan 1970 to a much more readable format
 sub convert_time {
     use POSIX qw(strftime);
     $now_string = strftime "%a %b %e %H:%M:%S %Y", localtime($_[0]);
@@ -178,16 +271,14 @@ sub convert_time {
 }
 
 sub create_new_user { 
-	my $user = param('Username'), my $pass = param('Password'), my $name= param('Name');
-	my $street = param('Street'), my $city = param('City'), my $state = param('State');
-	my $postcode = param('Postcode'), my $email = param('Email');
+    (my $id, my $user, my $pass, my $name, my $street, my $city, my $state, my $postcode, my $email) = @_;
 	if ((legal_login($user))&&(legal_password($pass))) {
         if (-e "users/$user") {
             our $last_error = "Username already taken. Choose another name.\n";
             return 0;
         } else {
 		    open F, ">users/$user";
-		    print F "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email\n";
+		    print F "id=$id\npassword=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email\n";
 		    close F;
 		    return 1;
         }
@@ -313,6 +404,10 @@ sub authenticate {
 	my %details =();
 	while (<USER>) {
 		next if !/^([^=]+)=(.*)/;
+        if (/^id\=.*/) {
+            $last_error = "User '$login' has not been confirmed yet. Please check your email.";
+            return 0;
+        }
 		$details{$1} = $2;
 	}
 	close(USER);
