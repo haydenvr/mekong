@@ -14,5 +14,6 @@ Date    Start   Stop    Activity
         7:30pm  10:15pm trying to fix navbar links, added ordering, started reading orders, fixed create_user
 29/10   4:00pm  5:50pm  implemented most of email confirmation, just fixing final creation of user account 
         7:20pm  10:00pm finished email confirmation and got most of password reset done too
+30/10   8:30am  8:45am  got forgot password working with decent security
 
-Total Time: 22hrs 20min
+Total Time: 22hrs 35min

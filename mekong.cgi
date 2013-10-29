@@ -53,19 +53,27 @@ sub cgi_main {
     } elsif ($action eq "reset_pass") {
         $page = "error";
         if (param_used(param('new_pass'))) {
-            my $id = param('id');
-            my $user = param('login');
-            if (($user eq $id)&&(change_pass(param('login'),param('new_pass')))) {
-                $template_variables{ERRORS} = "Congratulations, your password has been changed.";
-                remove_first_occurence($id, "users/forgot");
+            if (legal_password(param('new_pass'))) {
+                my $id = handle_reset(param('id'));
+                chomp $id;
+                my $user = param('login');
+                our $last_error = "Change not permitted";
+                if (($user eq $id)&&(change_pass(param('login'),param('new_pass')))) {
+                    $template_variables{ERRORS} = "Congratulations, your password has been changed.";
+                    remove_first_ocurrence($id, "users/forgot");
+                } else {
+                    $template_variables{ERRORS} = "$last_error<p>Change was not successful.";
+                }
             } else {
-                $template_variables{ERRORS} = "Change was not successful.";
+                $template_variables{ERRORS} = $last_error;
             }
         } else {
             my $user = handle_reset(param('id'));
+            chomp $user;
             my $id = param('id');
             if ($user ne "No") {
                 $page = "forgot_pass";
+                chomp $user;
                 $template_variables{PROMPT} = "Enter your new password";
                 $template_variables{VARIABLE} = "new_pass";
                 $template_variables{VALUE} = "reset_pass";
@@ -222,11 +230,15 @@ sub change_pass {
     (my $user, my $new_pass) = @_;
     our $last_error;
     if (legal_login($user)) {
-        remove_first_occurence("password","users/$user");
-        open F, ">>users/$user" or die;
-        print F "password\=$new_pass\n";
-        close F;
-        return 1;
+        if (remove_first_ocurrence("password","users/$user")) {
+            open F, ">>users/$user" or die;
+            print F "password\=$new_pass\n";
+            close F;
+            return 1;
+        } else {
+            $last_error = "System error";
+            return 0;
+        }
     } else {
         $last_error = "Username is not valid";
         return 0;
@@ -312,10 +324,10 @@ sub handle_forgot_pass {
             $last_error = "Email does not exist<p>@lines";
             return 0;
         }
-        open F, ">>users/$_[0]" or die;
+        #open F, ">>users/$_[0]" or die;
         my $unique_id = create_rand();
-        print F "forgot\=$unique_id\n";
-        close F;
+        #print F "forgot\=$unique_id\n";
+        #close F;
         open F, ">>users/forgot" or die;
         print F "$_[0]\=$unique_id\n";
         close F;
@@ -335,7 +347,7 @@ sub send_forgot_password {
     my $from_address = "mekong";
     my $subject = "Reset Password";
     my $body = <<eof;
-($to_address) Please go to $template_variables{PATH_TO_SITE}?action=reset_pass&id=$unique_id to change your password.
+Please go to $template_variables{PATH_TO_SITE}?action=reset_pass&id=$unique_id to change your password.
 eof
 
     my $mailer = Mail::Mailer->new("sendmail");
