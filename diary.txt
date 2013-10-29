@@ -13,5 +13,6 @@ Date    Start   Stop    Activity
         4:00pm  5:40pm  fixed urls to pages, added full page bookinfo, fixed some forms
         7:30pm  10:15pm trying to fix navbar links, added ordering, started reading orders, fixed create_user
 29/10   4:00pm  5:50pm  implemented most of email confirmation, just fixing final creation of user account 
+        7:20pm          finishing email confirmation
 
 Total Time: 19hrs 40min

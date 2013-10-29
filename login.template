@@ -62,8 +62,9 @@ Content-Type: text/html
         <label class="checkbox" >
           <input type="checkbox" value="remember-me"> Remember me
         </label>
-		<TMPL_VAR NAME=HIDDEN_VARS>.
+		<TMPL_VAR NAME=HIDDEN_VARS>
         <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Authenticate">Sign in</button>
+	<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Forgot Password" >Forgot Password</button>
 	<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Create New Account" >Create New Account</button>
       </form>
 

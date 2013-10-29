@@ -50,6 +50,14 @@ sub cgi_main {
         delete_basket($login,$remove);
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
+    } elsif ($action eq "Forgot Password") {
+        if (param_used($login)) {
+            $page = "error";
+            $template_variables{ERRORS} = "A link to reset your password has been sent to your email.";
+        } else {
+            $page = "error";
+            $template_variables{ERRORS} = "Congratulations, you are now dumber than I thought";  
+        }
     } elsif ($action eq "Checkedout") {
         if ((legal_credit_card_number(param('CCnum')))&&(legal_expiry_date(param('CCexp')))) {
             finalize_order($login,param('CCnum'),param('CCexp'));
@@ -60,7 +68,7 @@ sub cgi_main {
             $template_variables{ERRORS} = $last_error;
         }
     } elsif ($action eq "Check Orders") {
-        if (param_used($login)) {
+        if (authenticate($login,$password)) {
             my $orders;
             my @tmp;
             foreach $or (login_to_orders($login)) {
@@ -83,7 +91,7 @@ sub cgi_main {
 		$template_variables{AUTHOR} = $book_details{$book}{authors} || "";
 		$template_variables{PRICE} = $book_details{$book}{price} || "";
     } elsif ($action eq "Checkout") {
-        if (param_used($login)) {
+        if (authenticate($login,$password)) {
 	        my @basket_isbns = read_basket($login);
 	        if (!@basket_isbns) {
                 $template_variables{BASKET} = "Your shopping basket is empty.\n";  
@@ -102,7 +110,7 @@ sub cgi_main {
         }
         $template_variables{ERRORS} = "Hey buddy";
     } elsif (param_used($add_to_basket)) {
-        if ($template_variables{USER} ne "Not Logged In") {
+        if (authenticate($login,$password)) {
             add_basket($login,$add_to_basket);
 	 	    $template_variables{SEARCH_TERM} = $add_to_basket;
 	 	    $page = "search_form";
@@ -112,7 +120,7 @@ sub cgi_main {
             $template_variables{ERRORS} = "Not logged in, please log in";
         }
 	} elsif ($action eq "Basket") {
-        if (param_used($login)) {
+        if (authenticate($login,$password)) {
 	        my @basket_isbns = read_basket($login);
 	        if (!@basket_isbns) {
                 $template_variables{BASKET} = "Your shopping basket is empty.\n";  
@@ -183,27 +191,29 @@ sub cgi_main {
 # takes unique id and finds the related user. changes account permissions to full user.
 sub confirm_user_creation {
     my $id = $_[0];
-    my $dir = 'users/';
-    my $to_keep = '';
-    my @files_lines;
-    opendir(DIR,$dir) or die $!;
-    #while (my $file = readdir(DIR)) {
-    #    next if ($file =~ m/^\./);
-    #    open F, $file or die;
-    #    my @lines = <F>;
-    #    if ($lines[0] eq "id\=$id") {
-    #        $to_keep = $file;
-    #        @files_lines = @lines;
-    #        shift @files_lines;
-    #    }
-    #    close F;
-    #}
-    closedir(DIR);
-    #open F, ">$to_keep" or return 0;
-    #for $line (@files_lines) {
-    #    print F $line;
-    #}
+    my $dir = 'users/to_confirm';
+    return 0 if (!remove_first_ocurrence($id,$dir));
     return 1;
+}
+
+# removes the line containing first ocurrence of $word in $file
+# and returns if it occurred or not
+sub remove_first_ocurrence {
+    (my $word, my $file) = @_;
+    open F, $file or die;
+    my @lines = <F>;
+    my $to_ret = 0;
+    close F;
+    open F, ">$file" or die;
+    foreach my $line (@lines) {
+        if ($line =~ /$word/) {
+            $to_ret = 1;
+        } else {
+            print F $line;
+        }
+    }
+    close F;
+    return $to_ret;
 }
 
 # creates id for confirming account and sends email
@@ -278,8 +288,11 @@ sub create_new_user {
             return 0;
         } else {
 		    open F, ">users/$user";
-		    print F "id=$id\npassword=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email\n";
+		    print F "password=$pass\nname=$name\nstreet=$street\ncity=$city\nstate=$state\npostcode=$postcode\nemail=$email\n";
 		    close F;
+            open F, ">>users/to_confirm";
+            print F "$id=$user\n";
+            close F;
 		    return 1;
         }
 	} else {
@@ -307,7 +320,9 @@ sub search_results {
 sub legal_login {
 	my ($login) = @_;
 	our ($last_error);
-
+    if ($login eq 'to_confirm') { 
+        $last_error = "login '$login': not legal login."; 
+        return 0; }
 	if ($login !~ /^[a-zA-Z][a-zA-Z0-9]*$/) {
 		$last_error = "Invalid login '$login': logins must start with a letter and contain only letters and digits.";
 		return 0;
@@ -396,7 +411,15 @@ sub authenticate {
 	our (%user_details, $last_error);
 	
 	return 0 if !legal_login($login);
-	
+
+    open F, "users/to_confirm" or die;
+    my @logins = <F>;
+    close F;
+    if (grep /$login/, @logins) { 
+        $last_error = "User '$login' is not yet confirmed";
+        return 0;
+    }
+    	
 	if (!open(USER, "$users_dir/$login")) {
 		$last_error = "User '$login' does not exist.";
 		return 0;
