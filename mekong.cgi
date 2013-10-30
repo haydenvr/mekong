@@ -105,14 +105,25 @@ sub cgi_main {
             $page = "error";
             $template_variables{ERRORS} = $last_error;
         }
+    } elsif ($action eq "View Order") {
+        my $order_no = param('order_no');
+        if (param_used($order_no)) {
+            my @tmp = read_order($order_no);
+            $template_variables{ERRORS} = format_order(@tmp);
+            $template_variables{ALIGN_ME} = "align=\"center\"";
+        } else {
+            $template_variables{ERRORS} = "Error: Please select an order to view.\n";
+        }
+        $page = "error";
     } elsif ($action eq "Check Orders") {
         if (authenticate($login,$password)) {
             my $orders;
             my @tmp;
             foreach $or (login_to_orders($login)) {
                 @tmp = read_order($or);
-                $template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"action\" value=\"View Order\">View Order</button></td></tr>\n";
+                $template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"order_no\" value=\"$or\">View Order</button></td></tr>\n";
             }
+            $template_variables{HIDDEN_VARS} .= "<input type=\"hidden\" name=\"action\" value=\"View Order\">"; 
             $page = "orders"; 
         } else {
             $template_variables{ERRORS} = "Error: You need to be logged in to view your previous orders\n";
@@ -223,6 +234,18 @@ sub cgi_main {
 	# fill in template variables
 	$template->param(%template_variables);
 	print $template->output;
+}
+
+# takes an array of information of an order and returns it in nice html
+sub format_order {
+    (my @order) = @_;
+    my $order_time = shift @order;
+    my $last_3_digs = shift @order;
+    $last_3_digs =~ s/.{13}/xxxxxxxxxxxxx/;
+    my $cc_exp = shift @order;
+    my $line_to_return = get_order_descriptions(@order);
+    $line_to_return .= "<p>Order made at ". convert_time($order_time) . "<p>\n";
+    $line_to_return .= "By Credit Card num: $last_3_digs<p>Credit Card Exp: $cc_exp<p>\n"; 
 }
 
 # changes the password of a particular user
@@ -1107,6 +1130,41 @@ eof
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
 <td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
 <button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
+<br><br>$book_details{$isbn}{price}</td></tr>
+eof
+		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
+	}
+	$descriptions .= "</tbody></table></form>";
+	return $descriptions;
+}
+
+# return order descriptions of specified books in formatted table html
+sub get_order_descriptions {
+	if (!defined @_) { return "\n"; } 
+	my @isbns = @_;
+	my $descriptions = <<eof;
+<form class="btn-group" method="get">
+$template_variables{HIDDEN_VARS} 
+<table class="table">
+<thead>
+<td><b>Image</td>
+<td><b>Description</td>
+</thead>
+<tbody>
+eof
+	our %book_details;
+	foreach $isbn (@isbns) {
+		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
+		my $title = $book_details{$isbn}{title} || "";
+		my $authors = $book_details{$isbn}{authors} || "";
+		my $image = $book_details{$isbn}{smallimageurl} || "";
+		my $big_image = $book_details{$isbn}{largeimageurl} || "";
+		$authors =~ s/\n([^\n]*)$/ & $1/g;
+		$authors =~ s/\n/, /g;
+		$descriptions .= <<eof;
+<tr><td><a href="$big_image" ><img src="$image" ></a></td> 
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
+Price Paid:
 <br><br>$book_details{$isbn}{price}</td></tr>
 eof
 		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;

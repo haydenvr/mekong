@@ -57,7 +57,7 @@ Content-Type: text/html
 <div class="container" align="center">
 <!-- Example row of columns -->
 <form class="btn-group" method="post" align="center">
-<TMPL_VAR NAME=HIDDEN_INCLUDES>
+<TMPL_VAR NAME=HIDDEN_VARS>
     <table class="table" >
         <TMPL_VAR NAME=ORDERS>
     </table>
