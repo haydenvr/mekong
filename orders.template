@@ -33,7 +33,7 @@ Content-Type: text/html
             <li class="active" method="post"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search&login=<TMPL_VAR NAME=USER> >Search</a></li>
             <li><a href="#">Cart</a></li>
             <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
-            <li class="dropdown">
+                <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="#">Action</a></li>
@@ -55,13 +55,14 @@ Content-Type: text/html
 		</form>
     </div>
 <div class="container" align="center">
+<!-- Example row of columns -->
 <form class="btn-group" method="post" align="center">
-<table class="table" >
-<TMPL_VAR NAME=ORDERS>
-<tr><td>Order at 13th Nov</td><td><div class="btn-group"> <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Create New Account"></div></td></tr>
-</table>
+<TMPL_VAR NAME=HIDDEN_INCLUDES>
+    <table class="table" >
+        <TMPL_VAR NAME=ORDERS>
+    </table>
 </form>
-    </div>
+</div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
 </body>

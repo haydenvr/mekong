@@ -111,9 +111,9 @@ sub cgi_main {
             my @tmp;
             foreach $or (login_to_orders($login)) {
                 @tmp = read_order($or);
-                $template_variables{ERRORS} .= "Order at ".convert_time($tmp[0])."<p>\n";
+                $template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"action\" value=\"View Order\">View Order</button></td></tr>\n";
             }
-            $page = "error"; 
+            $page = "orders"; 
         } else {
             $template_variables{ERRORS} = "Error: You need to be logged in to view your previous orders\n";
             $page = "error"; 
