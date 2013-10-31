@@ -1,0 +1,63 @@
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>mekong</title>
+ <!-- Bootstrap core CSS -->
+    <link href="design/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="navbar.css" rel="stylesheet">	
+<link rel="stylesheet" type="text/css" href="signin.css" media="screen" />
+</head>
+<div class="container">
+	<form class="navbar navbar-default" method="post">
+	<TMPL_VAR NAME=HIDDEN_VARS>
+      <!-- Static navbar -->
+      <div class="navbar navbar-default">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Mekong</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active" method="post"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search&login=<TMPL_VAR NAME=USER> >Search</a></li>
+            <li><a href="#">Cart</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket&login=<TMPL_VAR NAME=USER> >Basket</a></li>
+            <li><a href="../navbar-static-top/">Static top</a></li>
+            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+		</form>
+    </div>
+<div class="container" <TMPL_VAR NAME=ALIGN_ME>>
+<TMPL_VAR NAME=ERRORS>
+</div>
+<!-- <TMPL_VAR NAME=CGI_PARAMS> -->
+</div>
+</body>
+</html>
