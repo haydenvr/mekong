@@ -33,11 +33,10 @@ sub cgi_main {
 	read_books($books_file);
     my $action = param('action') || 'signin';
 	my $login = param('login') || '';
-	my $password = param('password') || '';
+    my $password = param('password') || '';
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
     my $add_to_basket = param('add_to_basket');
-    my $remove = param('remove');
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
@@ -45,189 +44,33 @@ sub cgi_main {
         PATH_TO_SITE => CGI->new->url() 
 	);
     if (param_used($login)) { $template_variables{USER} = $login; }
-	my $page = "login";
-	if (param_used($remove)) {
-        delete_basket($login,$remove,param('quantity'));
-        $page = "error";
-        $template_variables{ERRORS} = "Book Successfully Removed\n";    
+	our $page = "login";
+	if (param_used(param('remove'))) {
+        handle_delete_basket();
     } elsif ($action eq "reset_pass") {
-        $page = "error";
-        if (param_used(param('new_pass'))) {
-            if (legal_password(param('new_pass'))) {
-                my $id = handle_reset(param('id'));
-                chomp $id;
-                my $user = param('login');
-                our $last_error = "Change not permitted";
-                if (($user eq $id)&&(change_pass(param('login'),param('new_pass')))) {
-                    $template_variables{ERRORS} = "Congratulations, your password has been changed.";
-                    remove_first_ocurrence($id, "users/forgot");
-                } else {
-                    $template_variables{ERRORS} = "$last_error<p>Change was not successful.";
-                }
-            } else {
-                $template_variables{ERRORS} = $last_error;
-            }
-        } else {
-            my $user = handle_reset(param('id'));
-            chomp $user;
-            my $id = param('id');
-            if ($user ne "No") {
-                $page = "forgot_pass";
-                chomp $user;
-                $template_variables{PROMPT} = "Enter your new password";
-                $template_variables{VARIABLE} = "new_pass";
-                $template_variables{VALUE} = "reset_pass";
-                $template_variables{KEEP_PARAMS} = "<input type=\"hidden\" name=\"login\" value=\"$user\"><input type=\"hidden\" name=\"id\" value=\"$id\">";
-            } else {
-                $template_variables{ERRORS} = "Need to provide valid id.";
-            }
-        }
+        handle_reset_pass();
     } elsif ($action eq "Forgot Password") {
-        if (param_used($login)) {
-            $page = "error";
-            if (handle_forgot_pass($login)) {
-                $template_variables{ERRORS} = "A link to reset your password has been sent to your email.";
-            } else { 
-                $template_variables{ERRORS} = $last_error;
-            }
-        } else {
-            $page = "forgot_pass";
-            $template_variables{PROMPT} = "Enter Username";
-            $template_variables{VARIABLE} = "login";
-            $template_variables{VALUE} = "Forgot Password";
-        }
+        handle_forgot_password();
     } elsif ($action eq "Checkedout") {
-        if ((legal_credit_card_number(param('CCnum')))&&(legal_expiry_date(param('CCexp')))) {
-            finalize_order($login,param('CCnum'),param('CCexp'));
-            $page = "error";
-            $template_variables{ERRORS} = "Congrats! Your order is now being processed.\n";  
-        } else {
-            $page = "error";
-            $template_variables{ERRORS} = $last_error;
-        }
-    } elsif ($action eq "View Order") {
-        my $order_no = param('order_no');
-        if (param_used($order_no)) {
-            my @tmp = read_order($order_no);
-            $template_variables{ERRORS} = format_order(@tmp);
-            $template_variables{ALIGN_ME} = "align=\"center\"";
-        } else {
-            $template_variables{ERRORS} = "Error: Please select an order to view.\n";
-        }
-        $page = "error";
+        handle_checkedout();
     } elsif ($action eq "Check Orders") {
-        if (authenticate($login,$password)) {
-            my $orders;
-            my @tmp;
-            foreach $or (login_to_orders($login)) {
-                @tmp = read_order($or);
-                $template_variables{ORDERS} .= "<div class=container>" . format_order(@tmp). "</div><hr>";
-
-                #$template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"order_no\" value=\"$or\">View Order</button></td></tr>\n";
-            }
-            $template_variables{HIDDEN_VARS} .= "<input type=\"hidden\" name=\"action\" value=\"View Order\">"; 
-            $page = "orders"; 
-        } else {
-            $template_variables{ERRORS} = "Error: You need to be logged in to view your previous orders\n";
-            $page = "error"; 
-        }
+        handle_check_orders();
     } elsif ($action eq "View") {
-        my $book = param('book');
-        $page = "book_info";
-        our %book_details;
-        $template_variables{ISBN} = $book;  
-        $template_variables{IMG_SOURCE} = $book_details{$book}{largeimageurl} || "";
-		$template_variables{BOOK_NAME} = $book_details{$book}{title} || "";
-        $template_variables{BOOK_INFO} = $book_details{$book}{productdescription} || "";
-		$template_variables{AUTHOR} = $book_details{$book}{authors} || "";
-		$template_variables{PRICE} = $book_details{$book}{price} || "";
+        handle_view_more();
     } elsif ($action eq "Checkout") {
-        if (authenticate($login,$password)) {
-	        my @basket_isbns = read_basket($login);
-	        if (!@basket_isbns) {
-                $template_variables{BASKET} = "Your shopping basket is empty.\n";  
-	        } else {
-		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
-                $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
-                $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
-                $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
-                my $amt_books = total_books(@basket_isbns);
-		        $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
-	        }
-            $page = "checkout";
-        } else {
-            $page = "error";
-            $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
-        }
+        handle_checkout();
     } elsif (param_used($add_to_basket)) {
-        if (authenticate($login,$password)) {
-            my $amt = param('quantity');
-            add_basket($login,$add_to_basket, $amt);
-	 	    $template_variables{SEARCH_TERM} = $add_to_basket;
-	 	    $page = "search_form";
-		    #need to add the $ISBN variable to cart
-        } else {
-            $page = "error";
-            $template_variables{ERRORS} = "Not logged in, please log in";
-        }
+        handle_add_to_basket();
 	} elsif ($action eq "Basket") {
-        if (authenticate($login,$password)) {
-	        my @basket_isbns = read_basket($login);
-	        if (!@basket_isbns) {
-                $template_variables{BASKET} = "Your shopping basket is empty.\n";  
-	        } else {
-		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
-                $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
-                $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
-                $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
-                my $amt_books = total_books(@basket_isbns);
-		        $template_variables{AMT_BOOKS} = "Total Price: \$".$amt_books."aud.\n";
-	        }
-            $page = "basket";
-        } else {
-            $page = "error";
-            $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
-        }
+        handle_view_basket();
     } elsif ($action eq "Create New Account") {
-		if (param_used(param('Name'))) {
-            my $user = param('Username');
-            $page = "error";
-            my $rand = create_rand();
-            my @to_pass = ($rand, param('Username'), param('Password'), param('Name'), param('Street'));
-            push(@to_pass, (param('City'), param('State'),param('Postcode'),param('Email')));
-            if (create_new_user(@to_pass)) {
-                send_confirm(param('Email'),$rand);
-                $template_variables{ERRORS} = "Please check your email for a confirmation.\n";
-            } else {
-                $template_variables{ERRORS} = $last_error;
-            }
-        } else {
-                # print page to create new account
-                $page = "create_new";
-		}
+        handle_create_new();
 	} elsif ($action eq "confirm") {
-        $page = "error";
-        if (param_used(param('id'))) {
-            if (confirm_user_creation(param('id'))) {
-                $template_variables{ERRORS} = "Congratulations, your account has now been confirmed. You may now login.";
-            } else {
-                $template_variables{ERRORS} = "Error ocurred when confirming email.";
-            }    
-        } else {
-            $template_variables{ERRORS} = "Error: Need unique ID to confirm user creation.";
-        }
+        handle_confirm();
     } elsif (param_used($search_terms)) {
-		$template_variables{SEARCH_TERM} = $search_terms;
-		$template_variables{RESULT_TABLE} = search_results($search_terms);
-		$page = "search_form";
+        handle_simple_search($search_terms);
 	} elsif ($action eq "Authenticate") {
-		if (authenticate($login, $password)) { 
-			$page = "search";
-		} else {
-            # need page for error
-            $page = "error";
-            $template_variables{ERRORS} = "Error: $last_error";
-		}	
+        handle_authenticate();
     } elsif ($action eq "Search") {
         $page = "search";
     }
@@ -237,6 +80,231 @@ sub cgi_main {
 	# fill in template variables
 	$template->param(%template_variables);
 	print $template->output;
+}
+
+# handles the deleting x amount of books from basket
+sub handle_delete_basket {
+    my $login = param('login') || "";
+    my $remove = param('remove') || "";
+    my $amt = param('quantity');
+    delete_basket($login,$remove,$amt);
+    $page = "error";
+    $template_variables{ERRORS} = "Quantity successfully adjusted to $amt.\n";    
+}
+
+# handles all steps involved in resetting password
+sub handle_reset_pass {
+    $page = "error";
+    if (param_used(param('new_pass'))) {
+        if (legal_password(param('new_pass'))) {
+            my $id = handle_reset(param('id'));
+            chomp $id;
+            my $user = param('login');
+            our $last_error = "Change not permitted";
+            if (($user eq $id)&&(change_pass(param('login'),param('new_pass')))) {
+                $template_variables{ERRORS} = "Congratulations, your password has been changed.";
+                remove_first_ocurrence($id, "users/forgot");
+            } else {
+                $template_variables{ERRORS} = "$last_error<p>Change was not successful.";
+            }
+        } else {
+            $template_variables{ERRORS} = $last_error;
+        }
+    } else {
+        my $user = handle_reset(param('id'));
+        chomp $user;
+        my $id = param('id');
+        if ($user ne "No") {
+            $page = "forgot_pass";
+            chomp $user;
+            $template_variables{PROMPT} = "Enter your new password";
+            $template_variables{VARIABLE} = "new_pass";
+            $template_variables{VALUE} = "reset_pass";
+            $template_variables{KEEP_PARAMS} = "<input type=\"hidden\" name=\"login\" value=\"$user\"><input type=\"hidden\" name=\"id\" value=\"$id\">";
+        } else {
+            $template_variables{ERRORS} = "Need to provide valid id.";
+        }
+    }
+}
+
+# handles all steps involved in submitting username when forget password
+sub handle_forgot_password {
+    my $login = param('login') || "";
+    if (param_used($login)) {
+        $page = "error";
+        if (handle_forgot_pass($login)) {
+            $template_variables{ERRORS} = "A link to reset your password has been sent to your email.";
+        } else { 
+            $template_variables{ERRORS} = $last_error;
+        }
+    } else {
+        $page = "forgot_pass";
+        $template_variables{PROMPT} = "Enter Username";
+        $template_variables{VARIABLE} = "login";
+        $template_variables{VALUE} = "Forgot Password";
+    }
+}
+
+# handles checking the users CC number and CC expiry and then makes order
+sub handle_checkedout {
+    my $login = param('login');
+    if ((legal_credit_card_number(param('CCnum')))&&(legal_expiry_date(param('CCexp')))) {
+        finalize_order($login,param('CCnum'),param('CCexp'));
+        $page = "error";
+        $template_variables{ERRORS} = "Congrats! Your order is now being processed.\n";  
+    } else {
+        $page = "error";
+        $template_variables{ERRORS} = $last_error;
+    }
+}
+
+# generates html containing all of the users past orders
+sub handle_check_orders {
+    my $login = param('login');
+    my $password = param('password');
+    if (authenticate($login,$password)) {
+        my $orders;
+        my @tmp;
+        foreach $or (login_to_orders($login)) {
+            @tmp = read_order($or);
+            $template_variables{ORDERS} .= "<div class=container>" . format_order(@tmp). "</div><hr>";
+        }
+        $template_variables{HIDDEN_VARS} .= "<input type=\"hidden\" name=\"action\" value=\"View Order\">"; 
+        $page = "orders"; 
+    } else {
+        $template_variables{ERRORS} = "Error: You need to be logged in to view your previous orders\n";
+        $page = "error"; 
+    }
+}
+
+# generates page for a specific book
+sub handle_view_more {
+    my $book = param('book');
+    $page = "book_info";
+    our %book_details;
+    $template_variables{ISBN} = $book;  
+    $template_variables{IMG_SOURCE} = $book_details{$book}{largeimageurl} || "";
+	$template_variables{BOOK_NAME} = $book_details{$book}{title} || "";
+    $template_variables{BOOK_INFO} = $book_details{$book}{productdescription} || "";
+	$template_variables{AUTHOR} = $book_details{$book}{authors} || "";
+	$template_variables{PRICE} = $book_details{$book}{price} || "";
+}
+
+# handles entry of data during checkout phase
+sub handle_checkout {
+    my $login = param('login');
+    my $password = param('password');
+    $page = "error";
+    if (authenticate($login,$password)) {
+        my @basket_isbns = read_basket($login);
+        if (!@basket_isbns) {
+            $template_variables{BASKET} = "Your shopping basket is empty.\n";  
+        } else {
+            $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
+            $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
+            $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
+            $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
+            my $amt_books = total_books(@basket_isbns);
+            $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
+        }
+        $page = "checkout";
+    } else {
+        $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
+    }
+}
+
+# adds book to basket
+sub handle_add_to_basket {
+    my $login = param('login');
+    my $password = param('password');
+    if (authenticate($login,$password)) {
+        my $add_to_basket = param('add_to_basket');
+        my $amt = param('quantity');
+        add_basket($login, $add_to_basket, $amt);
+        $template_variables{SEARCH_TERM} = $add_to_basket;
+        $page = "search_form";
+        #need to add the $ISBN variable to cart
+    } else {
+        $page = "error";
+        $template_variables{ERRORS} = "Not logged in, please log in";
+    }
+}
+
+# shows the current users basket
+sub handle_view_basket {
+    my $login = param('login') || "";
+    my $password = param('password') || "";
+    if (authenticate($login,$password)) {
+        my @basket_isbns = read_basket($login);
+        if (!@basket_isbns) {
+            $template_variables{BASKET} = "Your shopping basket is empty.\n";  
+        } else {
+            $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
+            $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
+            $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
+            $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
+            my $amt_books = total_books(@basket_isbns);
+            $template_variables{AMT_BOOKS} = "Total Price: \$".$amt_books."aud.\n";
+        }
+        $page = "basket";
+    } else {
+        $page = "error";
+        $template_variables{ERRORS} = "Error: You need to be logged in to check your basket\n";
+    }
+}
+
+# returns results to search term
+sub handle_simple_search {
+    $template_variables{SEARCH_TERM} = $_[0];
+    $template_variables{RESULT_TABLE} = search_results($_[0]);
+    $page = "search_form";
+}
+
+# checks an email confirm for when creating an account
+sub handle_confirm {
+    $page = "error";
+    if (param_used(param('id'))) {
+        if (confirm_user_creation(param('id'))) {
+            $template_variables{ERRORS} = "Congratulations, your account has now been confirmed. You may now login.";
+        } else {
+            $template_variables{ERRORS} = "Error ocurred when confirming email.";
+        }    
+    } else {
+        $template_variables{ERRORS} = "Error: Need unique ID to confirm user creation.";
+    }
+}
+
+# handles the form for getting user information when registering
+sub handle_create_new {
+    if (param_used(param('Name'))) {
+        my $user = param('Username');
+        $page = "error";
+        my $rand = create_rand();
+        my @to_pass = ($rand, param('Username'), param('Password'), param('Name'), param('Street'));
+        push(@to_pass, (param('City'), param('State'),param('Postcode'),param('Email')));
+        if (create_new_user(@to_pass)) {
+            send_confirm(param('Email'),$rand);
+            $template_variables{ERRORS} = "Please check your email for a confirmation.\n";
+        } else {
+            $template_variables{ERRORS} = $last_error;
+        }
+    } else {
+        # print page to create new account
+        $page = "create_new";
+    }
+}
+
+# checks input from login screen and returns search screen
+sub handle_authenticate {
+        my $password = param('password');
+        my $login = param('login');
+		if (authenticate($login, $password)) { 
+			$page = "search";
+		} else {
+            # need page for error
+            $page = "error";
+            $template_variables{ERRORS} = "Error: $last_error";
+		}	
 }
 
 # takes an array of information of an order and returns it in nice html
@@ -386,7 +454,7 @@ eof
     $mailer->close();
 }
 
-# creates a relatively large random number
+# creates a relatively large random number for security purposes
 sub create_rand {
     my $range = 900000000000;
     my $offset = 100000000000;
@@ -406,6 +474,7 @@ sub convert_time {
     return $now_string;
 }
 
+# adds new user details to the appropriate directory to retain information
 sub create_new_user { 
     (my $id, my $user, my $pass, my $name, my $street, my $city, my $state, my $postcode, my $email) = @_;
 	if ((legal_login($user))&&(legal_password($pass))) {
@@ -733,9 +802,11 @@ sub delete_basket {
 
 sub add_basket {
 	my ($login, $isbn, $amt) = @_;
-	open F, "$baskets_dir/$login" or die "Can not open $baskets_dir/$login::$! \n";
-    my @basket = <F>;
-    close F;
+    my @basket;
+	if (open F, "$baskets_dir/$login") { # or die "Can not open $baskets_dir/$login::$! \n";
+        @basket = <F>;
+        close F;
+    }
     open F, ">$baskets_dir/$login" or die;
     my $flag = 0;
     foreach my $item (@basket) {
@@ -1208,8 +1279,6 @@ sub get_book_descriptions {
 	if (!defined @_) { return "\n"; } 
 	my @isbns = @_;
 	my $descriptions = <<eof;
-<form class="btn-group" method="get">
-$template_variables{HIDDEN_VARS} 
 <table class="table">
 <thead>
 <td><b>Image</td>
@@ -1233,15 +1302,17 @@ eof
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
+<form class="btn-group" method="get">
+$template_variables{HIDDEN_VARS} 
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
 <td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td>
 <td><input type="text" name="quantity" class="form_control spinedit noSelect" id="spinEdit" value="$amt" min="1"></td>
 <td><button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
-<br><br>$book_details{$isbn}{price}</td></tr>
+<br><br>$book_details{$isbn}{price}</td></tr></form>
 eof
 		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
 	}
-	$descriptions .= "</tbody></table></form>";
+	$descriptions .= "</tbody></table>";
 	return $descriptions;
 }
 
