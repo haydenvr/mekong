@@ -47,7 +47,7 @@ sub cgi_main {
     if (param_used($login)) { $template_variables{USER} = $login; }
 	my $page = "login";
 	if (param_used($remove)) {
-        delete_basket($login,$remove);
+        delete_basket($login,$remove,param('quantity'));
         $page = "error";
         $template_variables{ERRORS} = "Book Successfully Removed\n";    
     } elsif ($action eq "reset_pass") {
@@ -121,7 +121,9 @@ sub cgi_main {
             my @tmp;
             foreach $or (login_to_orders($login)) {
                 @tmp = read_order($or);
-                $template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"order_no\" value=\"$or\">View Order</button></td></tr>\n";
+                $template_variables{ORDERS} .= "<div class=container>" . format_order(@tmp). "</div><hr>";
+
+                #$template_variables{ORDERS} .= "<tr><td>Order at ".convert_time($tmp[0])."<p></td><td><button class=\"btn btn btn-primary btn-block\" type=\"submit\" name=\"order_no\" value=\"$or\">View Order</button></td></tr>\n";
             }
             $template_variables{HIDDEN_VARS} .= "<input type=\"hidden\" name=\"action\" value=\"View Order\">"; 
             $page = "orders"; 
@@ -146,9 +148,9 @@ sub cgi_main {
                 $template_variables{BASKET} = "Your shopping basket is empty.\n";  
 	        } else {
 		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
-                $template_variables{BASKET} =~ s/Buy Me!/Remove/g;
+                $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
                 $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
-                $template_variables{BASKET} =~ s/<b>Price/<b>Remove Book/;
+                $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
                 my $amt_books = total_books(@basket_isbns);
 		        $template_variables{AMT_BOOKS} = "Total Price: $amt_books UD\n";
 	        }
@@ -159,7 +161,8 @@ sub cgi_main {
         }
     } elsif (param_used($add_to_basket)) {
         if (authenticate($login,$password)) {
-            add_basket($login,$add_to_basket);
+            my $amt = param('quantity');
+            add_basket($login,$add_to_basket, $amt);
 	 	    $template_variables{SEARCH_TERM} = $add_to_basket;
 	 	    $page = "search_form";
 		    #need to add the $ISBN variable to cart
@@ -174,9 +177,9 @@ sub cgi_main {
                 $template_variables{BASKET} = "Your shopping basket is empty.\n";  
 	        } else {
 		        $template_variables{BASKET} = get_book_descriptions(@basket_isbns);
-                $template_variables{BASKET} =~ s/Buy Me!/Remove/g;
+                $template_variables{BASKET} =~ s/Buy Me!/Adjust/g;
                 $template_variables{BASKET} =~ s/name\=\"add\_to\_basket\"/name\=\"remove\"/g;
-                $template_variables{BASKET} =~ s/<b>Price/<b>Remove Book/;
+                $template_variables{BASKET} =~ s/<b>Price/<b>Adjust Quantity/;
                 my $amt_books = total_books(@basket_isbns);
 		        $template_variables{AMT_BOOKS} = "Total Price: \$".$amt_books."aud.\n";
 	        }
@@ -229,7 +232,7 @@ sub cgi_main {
         $page = "search";
     }
 	# load HTML template from file
-	my $template = HTML::Template->new(filename => "$page.template", die_on_bad_params => 0);
+	my $template = HTML::Template->new(filename => "design/$page.template", die_on_bad_params => 0);
 
 	# fill in template variables
 	$template->param(%template_variables);
@@ -240,12 +243,12 @@ sub cgi_main {
 sub format_order {
     (my @order) = @_;
     my $order_time = shift @order;
-    my $last_3_digs = shift @order;
-    $last_3_digs =~ s/.{13}/xxxxxxxxxxxxx/;
+    my $last_4_digs = shift @order;
+    $last_4_digs =~ s/.{12}/xxxxxxxxxxxx/;
     my $cc_exp = shift @order;
     my $line_to_return = get_order_descriptions(@order);
     $line_to_return .= "<p>Order made at ". convert_time($order_time) . "<p>\n";
-    $line_to_return .= "By Credit Card num: $last_3_digs<p>Credit Card Exp: $cc_exp<p>\n"; 
+    $line_to_return .= "By Credit Card num: $last_4_digs<p>Credit Card Exp: $cc_exp<p>\n"; 
 }
 
 # changes the password of a particular user
@@ -518,9 +521,11 @@ sub total_books {
 	our %book_details;
 	$total = 0;
 	foreach $isbn (@isbns) {
+        ($isbn, my $amt) = split /,/,$isbn;
 		die "Internal error: unknown isbn $isbn  in total_books" if !$book_details{$isbn}; # shouldn't happen
 		my $price = $book_details{$isbn}{price};
 		$price =~ s/[^0-9\.]//g;
+        $price *= $amt;
 		$total += $price;
 	}
 	return $total;
@@ -705,13 +710,17 @@ sub read_basket {
 # only first occurance is deleted
 
 sub delete_basket {
-	my ($login, $delete_isbn) = @_;
+	(my $login, my $delete_isbn, my $amt_remove) = @_;
 	my @isbns = read_basket($login);
 	open F, ">$baskets_dir/$login" or die "Can not open $baskets_dir/$login: $!";
 	foreach $isbn (@isbns) {
-		if ($isbn eq $delete_isbn) {
-			$delete_isbn = "";
-			next;
+		if ($isbn =~ /$delete_isbn/) {
+            if ($amt_remove > 0) {
+                $isbn =~ s/,\d+/,$amt_remove/;
+            } else {
+                $delete_isbn = "";
+                next;
+            }
 		}
 		print F "$isbn\n";
 	}
@@ -723,9 +732,22 @@ sub delete_basket {
 # add specified book to specified user's basket
 
 sub add_basket {
-	my ($login, $isbn) = @_;
-	open F, ">>$baskets_dir/$login" or die "Can not open $baskets_dir/$login::$! \n";
-	print F "$isbn\n";
+	my ($login, $isbn, $amt) = @_;
+	open F, "$baskets_dir/$login" or die "Can not open $baskets_dir/$login::$! \n";
+    my @basket = <F>;
+    close F;
+    open F, ">$baskets_dir/$login" or die;
+    my $flag = 0;
+    foreach my $item (@basket) {
+        chomp $item;
+        if ($item =~ /^$isbn,(\d+)$/) {
+            $amt += $1;
+            $item = "$isbn,$amt";
+            $flag = 1;
+        } 
+        print F "$item\n";
+    }
+    print F "$isbn,$amt\n" if $flag == 0;
 	close(F);
 }
 
@@ -1145,27 +1167,35 @@ sub get_order_descriptions {
 	my $descriptions = <<eof;
 <form class="btn-group" method="get">
 $template_variables{HIDDEN_VARS} 
-<table class="table">
+<table class="table" width="100%">
 <thead>
-<td><b>Image</td>
-<td><b>Description</td>
+<td style="width:150px"><b>Image</td>
+<td style="width:600px"><b>Description</td>
+<td style="width:150px"><b>Quantity Ordered</td>
+<td style="width:150px"><b>Price</td>
 </thead>
 <tbody>
 eof
 	our %book_details;
+    my $amt;
 	foreach $isbn (@isbns) {
+        ($isbn,$amt) = split /,/,$isbn; 
 		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
 		my $title = $book_details{$isbn}{title} || "";
 		my $authors = $book_details{$isbn}{authors} || "";
 		my $image = $book_details{$isbn}{smallimageurl} || "";
 		my $big_image = $book_details{$isbn}{largeimageurl} || "";
+        my $price = $book_details{$isbn}{price} || "";
+        $price =~ s/\$//;
+        $price *= $amt;
 		$authors =~ s/\n([^\n]*)$/ & $1/g;
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
-<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
-Price Paid:
-<br><br>$book_details{$isbn}{price}</td></tr>
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td>
+<td>You purchased: $amt</td>
+<td>Price Paid:
+<br><br>\$$price</td></tr>
 eof
 		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
 	}
@@ -1184,12 +1214,17 @@ $template_variables{HIDDEN_VARS}
 <thead>
 <td><b>Image</td>
 <td><b>Description</td>
+<td><b>Amount</td>
 <td><b>Price</td>
 </thead>
 <tbody>
 eof
 	our %book_details;
 	foreach $isbn (@isbns) {
+        my $amt = 1;
+        if ($isbn =~ /\,/) {
+            ($isbn, $amt) = split /,/,$isbn;
+        }
 		die "Internal error: unknown isbn $isbn in print_books\n" if !$book_details{$isbn}; # shouldn't happen
 		my $title = $book_details{$isbn}{title} || "";
 		my $authors = $book_details{$isbn}{authors} || "";
@@ -1199,8 +1234,9 @@ eof
 		$authors =~ s/\n/, /g;
 		$descriptions .= <<eof;
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
-<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td><td>
-<button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td>
+<td><input type="text" name="quantity" class="form_control spinedit noSelect" id="spinEdit" value="$amt" min="1"></td>
+<td><button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
 <br><br>$book_details{$isbn}{price}</td></tr>
 eof
 		#$descriptions .= start_form,submit("$isbn",'Buy Me!'),end_form;
