@@ -82,6 +82,21 @@ sub cgi_main {
 	print $template->output;
 }
 
+# prints out the http header and includes relevant cookies
+sub handle_cookies {
+    use CGI::Cookie;
+    %cookies = fetch CGI::Cookie;
+    if ($cookies{'x'}) {
+        $x = $cookies{'x'}->value;
+        print header(-cookie=>"x=$x");
+    } elsif (param('x')) {
+        $x = param('x');
+        print header(-cookie=>"x=$x");
+    } else {
+        print header;
+    }
+}
+
 # handles the deleting x amount of books from basket
 sub handle_delete_basket {
     my $login = param('login') || "";
