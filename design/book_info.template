@@ -64,6 +64,7 @@ Content-Type: text/html
     		</form>
        </div>
         <div class="col-md-4">
+         	<h4 class="media-heading">Further Details</h4> <p>
         	publisher: <TMPL_VAR NAME=PUBLISHER> <p>
 			edition: <TMPL_VAR NAME=EDITION> <p>
 			binding: <TMPL_VAR NAME=BINDING> <p>
