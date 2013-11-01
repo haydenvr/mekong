@@ -19,6 +19,5 @@ Date    Start   Stop    Activity
 31/10   10:00am 10:40am reading a specific order to html
         9:50pm  11:15pm got multiple books working in orders/basket
 1/11    9:00pm  10:50am cleaning up code to make it look better, plus fixing bugs
-        5:00pm          
 
 Total Time: 27hrs 15min

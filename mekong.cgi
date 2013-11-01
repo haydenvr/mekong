@@ -6,7 +6,6 @@
 
 use CGI qw/:all/;
 use HTML::Template;
-use CGI::Cookie;
 
 $debug = 0;
 $| = 1;
@@ -32,19 +31,18 @@ exit 0;
 sub cgi_main {
 	set_global_variables();
 	read_books($books_file);
-	our %cookies = fetch CGI::Cookie;
-	my $login = find_cookie("login");
-	my $password = find_cookie("password");
     my $action = param('action') || 'signin';
+	my $login = param('login') || '';
+    my $password = param('password') || '';
 	my $search_terms = param('search_terms');
 	my $create_new = param('Create New Account');
     my $add_to_basket = param('add_to_basket');
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
-		USER => "Not Logged In",
+		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
+        USER => "Not Logged In",
         PATH_TO_SITE => CGI->new->url() 
 	);
-	#HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">"
     if (param_used($login)) { $template_variables{USER} = $login; }
 	our $page = "login";
 	if (param_used(param('remove'))) {
@@ -78,33 +76,10 @@ sub cgi_main {
     }
 	# load HTML template from file
 	my $template = HTML::Template->new(filename => "design/$page.template", die_on_bad_params => 0);
-	
-	# print out header with cookies
-	handle_header($login,$password);
 
 	# fill in template variables
 	$template->param(%template_variables);
 	print $template->output;
-}
-
-# looks through cookies, then params for a specified variable
-sub find_cookie {
-	my $to_find = $_[0];
-	our %cookies;
-	if (defined $cookies{$to_find}) {
-        $x = $cookies{$to_find}->value;
-    } elsif (param($to_find)) {
-        $x = param($to_find);
-    } else {
-        $x = "";
-    }
-	return $x;
-}
-
-# prints out the http header and includes relevant cookies
-sub handle_header {
-    my ($login, $password) = @_;
-	print header(-cookie=>["login=$login","password=$password"]);    
 }
 
 # handles the deleting x amount of books from basket
