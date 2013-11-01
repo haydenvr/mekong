@@ -40,10 +40,12 @@ sub cgi_main {
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
-        USER => "Not Logged In",
+        USER => "Not",
+		PASSWORD => "Not",
         PATH_TO_SITE => CGI->new->url() 
 	);
     if (param_used($login)) { $template_variables{USER} = $login; }
+	if (param_used($password)) { $template_variables{PASSWORD} = $password; }
 	our $page = "login";
 	if (param_used(param('remove'))) {
         handle_delete_basket();

@@ -33,26 +33,12 @@ Content-Type: text/html
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active" ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search&login=<TMPL_VAR NAME=USER> >Search</a></li>
-            <li><a href="#">Cart</a></li>
-            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li>
+            <li class="active" ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Search&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Search</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Basket</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Check%20Orders&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Check Orders</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Basket&login=<TMPL_VAR NAME=USER> >Basket</a></li>
-            <li><a href="../navbar-static-top/">Static top</a></li>
-            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
           </ul>
         </div><!--/.nav-collapse -->
 		</form>
@@ -70,10 +56,5 @@ Content-Type: text/html
 </form></div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->
 </div>
-<script src="./design/spinedit.js"></script>
-<script src="./design/jquery.js"></script>
-<script type="text/javascript">
-       $('#spinEdit').spinedit();
-</script>
 </body>
 </html>
