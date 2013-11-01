@@ -38,7 +38,7 @@ Content-Type: text/html
             <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Check%20Orders&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Check Orders</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?<TMPL_VAR NAME=SIGNOUT>><TMPL_VAR NAME=SIGNING></a></li>
           </ul>
         </div><!--/.nav-collapse -->
 		</form>
@@ -48,20 +48,13 @@ Content-Type: text/html
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-4">
-         	<img class="media-object" src="<TMPL_VAR NAME=IMG_SOURCE>" alt="Book image">
+         	<img class="media-object" src="<TMPL_VAR NAME=IMG_SOURCE>" height="390px" width="380px" alt="Book image">
         </div>
         <div class="col-md-4">
          	 <h4 class="media-heading"><TMPL_VAR NAME=BOOK_NAME></h4>
     		<p><p>Author:<i> <TMPL_VAR NAME=AUTHOR> </i><p>
 			ISBN: <TMPL_VAR NAME=ISBN> <p><p>
 			<TMPL_VAR NAME=BOOK_INFO>
-			<p><p>
-    		<form method="get">
-        		<TMPL_VAR NAME=HIDDEN_VARS>
-        		<br>Enter amount :<input type="text" name="quantity" class="form_control spinedit noSelect" id="spinEdit" value="1" min="1">
-	    		<br><br><TMPL_VAR NAME=PRICE> each  
-        		<p><button type="submit" class="btn btn-default" name="add_to_basket" value="<TMPL_VAR NAME=ISBN>">Buy Me!</button> 
-    		</form>
        </div>
         <div class="col-md-4">
          	<h4 class="media-heading">Further Details</h4> <p>
@@ -74,6 +67,12 @@ Content-Type: text/html
 			ean: <TMPL_VAR NAME=EAN> <p>
 			salesrank: <TMPL_VAR NAME=SALESRANK> <p>
 			year: <TMPL_VAR NAME=YEAR> <p>
+    		<form method="get">
+        		<TMPL_VAR NAME=HIDDEN_VARS>
+        		<br>Enter amount :<input type="text" name="quantity" class="form_control spinedit noSelect" id="spinEdit" value="1" min="1">
+	    		<br><br><TMPL_VAR NAME=PRICE> each  
+        		<p><button type="submit" class="btn btn-default" name="add_to_basket" value="<TMPL_VAR NAME=ISBN>">Buy Me!</button> 
+    		</form>
         </div>
       </div>
 <!-- <TMPL_VAR NAME=CGI_PARAMS> -->

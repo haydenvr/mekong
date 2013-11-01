@@ -38,7 +38,7 @@ Content-Type: text/html
             <li class="active" ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Check%20Orders&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Check Orders</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li class="active" ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
           </ul>
         </div><!--/.nav-collapse -->
 		</form>

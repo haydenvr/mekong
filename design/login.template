@@ -38,7 +38,7 @@ Content-Type: text/html
             <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Check%20Orders&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Check Orders</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active" ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?<TMPL_VAR NAME=SIGNOUT>><TMPL_VAR NAME=SIGNING></a></li>
           </ul>
         </div><!--/.nav-collapse -->
 		</form>
@@ -48,9 +48,6 @@ Content-Type: text/html
         <h2 class="form-signin-heading">Please sign in</h2>
         <input type="text" class="form-control" name="login" placeholder="Username" align="center" autofocus><p>
         <input type="password" class="form-control" name="password" placeholder="Password">
-        <label class="checkbox" >
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
 		<TMPL_VAR NAME=HIDDEN_VARS>
         <button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Authenticate">Sign in</button>
 	<button class="btn btn-lg btn-primary btn-block" type="submit" name="action" value="Forgot Password" >Forgot Password</button>

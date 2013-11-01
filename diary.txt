@@ -20,5 +20,6 @@ Date    Start   Stop    Activity
         9:50pm  11:15pm got multiple books working in orders/basket
 1/11    9:00am  10:50am cleaning up code to make it look better, plus fixing bugs
         7:30pm  9:20pm  attempted using cookies but couln't get working, cleaned up interface and added more info to book page
+2/11    10:00am 10:20am finishing up interface and doing final checks before submit
 
-Total Time: 29hrs 05min
+Total Time: 29hrs 25min

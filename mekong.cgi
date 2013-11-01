@@ -40,14 +40,22 @@ sub cgi_main {
     our %template_variables = (
 	    CGI_PARAMS => join(",", map({"$_='".param($_)."'"} param())),
 		HIDDEN_VARS => "<input type=\"hidden\" name=\"login\" value=\"$login\">\n<input type=\"hidden\" name=\"password\" value=\"$password\">",
-        USER => "Not",
-		PASSWORD => "Not",
-        PATH_TO_SITE => CGI->new->url() 
+        USER => "$login",
+		PASSWORD => "$password",
+        PATH_TO_SITE => CGI->new->url(), 
+        SIGNING => "Sign In"
 	);
-    if (param_used($login)) { $template_variables{USER} = $login; }
-	if (param_used($password)) { $template_variables{PASSWORD} = $password; }
+    if (authenticate($login,$password)) {
+        $template_variables{SIGNING} = "You are signed in as $login. Sign Out.";
+        $template_variables{SIGNOUT} = "action=Signout";
+    }
+    #if (param_used($login)) { $template_variables{USER} = $login; }
+	#if (param_used($password)) { $template_variables{PASSWORD} = $password; }
 	our $page = "login";
-	if (param_used(param('remove'))) {
+	if ($action eq "Signout") {
+        $page = "error";
+        $template_variables{ERRORS} = "Congratulations, you have been signed out.";
+    } elsif (param_used(param('remove'))) {
         handle_delete_basket();
     } elsif ($action eq "reset_pass") {
         handle_reset_pass();
@@ -1318,7 +1326,7 @@ eof
 <form class="btn-group" method="get">
 $template_variables{HIDDEN_VARS} 
 <tr><td><a href="$big_image" ><img src="$image" ></a></td> 
-<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn>more</a></i><br></td>
+<td><i>$title</i><br>$authors <i><a href=$template_variables{PATH_TO_SITE}?action=View&book=$isbn&login=$template_variables{USER}&password=$template_variables{PASSWORD}>more</a></i><br></td>
 <td><input type="text" name="quantity" class="form_control spinedit noSelect" id="spinEdit" value="$amt" min="1"></td>
 <td><button type="submit" class="btn btn-default" name="add_to_basket" value="$isbn">Buy Me!</button> 
 <br><br>$book_details{$isbn}{price}</td></tr></form>

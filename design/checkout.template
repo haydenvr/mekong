@@ -38,7 +38,7 @@ Content-Type: text/html
             <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?action=Check%20Orders&login=<TMPL_VAR NAME=USER>&password=<TMPL_VAR NAME=PASSWORD> >Check Orders</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>>Sign In</a></li>
+            <li ><a href=<TMPL_VAR NAME=PATH_TO_SITE>?<TMPL_VAR NAME=SIGNOUT>><TMPL_VAR NAME=SIGNING></a></li>
           </ul>
         </div><!--/.nav-collapse -->
 		</form>
@@ -46,14 +46,14 @@ Content-Type: text/html
 <div class="container">
 <TMPL_VAR NAME=BASKET>
 </div>
-<div class="container">
+<div class="container" align="center">
 <TMPL_VAR NAME=AMT_BOOKS>
 </div>
-<div class="container">
+<div class="container" align="center">
       <form class="input-group input-group-sm" method="post" align="center" >
 		<TMPL_VAR NAME=HIDDEN_VARS>
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">Name</span>
+          <span class="input-group-addon" style="width:131px" >Name</span>
             <input type="text" class="form-control" name="Name" placeholder="Name">
         </div>
         <div class="input-group input-group-sm">
@@ -61,11 +61,11 @@ Content-Type: text/html
             <input type="text" class="form-control" name="CCnum" placeholder="CCnum">
         </div>
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">Credit Card Expiry</span>
+          <span class="input-group-addon" style="width:131px" >Credit Card Expiry</span>
             <input type="text" class="form-control" name="CCexp" placeholder="CCexp">
         </div>
         <div class="btn-group">
-          <button type="submit" class="btn btn-default" action=<TMPL_VAR NAME=PATH_TO_SITE> name="action" value="Checkedout">Buy!</button></div>
+          <button type="submit" class="btn btn-default" action=<TMPL_VAR NAME=PATH_TO_SITE>  style="width:301px" name="action" value="Checkedout">Buy!</button></div>
       </form>
 
     </div>
