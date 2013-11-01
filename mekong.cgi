@@ -190,6 +190,17 @@ sub handle_view_more {
     $template_variables{BOOK_INFO} = $book_details{$book}{productdescription} || "";
 	$template_variables{AUTHOR} = $book_details{$book}{authors} || "";
 	$template_variables{PRICE} = $book_details{$book}{price} || "";
+	
+	#setting more details column
+	$template_variables{PUBLISHER} = $book_details{$book}{publisher} || "";
+	$template_variables{EDITION} = $book_details{$book}{edition} || "";
+	$template_variables{BINDING} = $book_details{$book}{binding} || "";
+	$template_variables{CATALOG} = $book_details{$book}{catalog} || "";
+	$template_variables{NUMPAGES} = $book_details{$book}{numpages} || "";
+	$template_variables{PUB_DATE} = $book_details{$book}{publication_date} || "";
+	$template_variables{EAN} = $book_details{$book}{ean} || "";
+	$template_variables{SALESRANK} = $book_details{$book}{salesrank} || "";
+	$template_variables{YEAR} = $book_details{$book}{year} || "";
 }
 
 # handles entry of data during checkout phase
