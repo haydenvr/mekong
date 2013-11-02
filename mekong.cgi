@@ -238,15 +238,15 @@ sub handle_checkout {
 sub handle_add_to_basket {
     my $login = param('login');
     my $password = param('password');
+    $page = "error";
     if (authenticate($login,$password)) {
+        our %book_details;
         my $add_to_basket = param('add_to_basket');
         my $amt = param('quantity');
+        my $book = $book_details{$add_to_basket}{title};
         add_basket($login, $add_to_basket, $amt);
-        $template_variables{SEARCH_TERM} = $add_to_basket;
-        $page = "search_form";
-        #need to add the $ISBN variable to cart
+        $template_variables{ERRORS} = "Congratulations, $book has been added to your basket.\n";
     } else {
-        $page = "error";
         $template_variables{ERRORS} = "Not logged in, please log in";
     }
 }

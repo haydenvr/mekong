@@ -50,7 +50,7 @@ Content-Type: text/html
   <span class="input-group-addon">@</span>
   <TMPL_VAR NAME=HIDDEN_VARS>
   <input type="hidden" name="action" value="Search">
-  <input type="text" name="search_terms" class="form-control" placeholder=<TMPL_VAR NAME=SEARCH_TERM>>
+  <input type="text" name="search_terms" class="form-control" value=<TMPL_VAR NAME=SEARCH_TERM>>
 </div>
 </pre>
 </form></div>
